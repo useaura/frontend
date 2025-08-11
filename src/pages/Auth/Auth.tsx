@@ -46,41 +46,6 @@ export const Auth = () => {
             </svg>
             Sign in with Google
           </button>
-
-          {/* Info Text */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-text-secondary">
-              We will create your wallet automatically
-            </p>
-          </div>
-        </div>
-        
-        {/* Features */}
-        <div className="mt-8 grid grid-cols-3 gap-4 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-          <div className="text-center">
-            <div className="w-12 h-12 bg-surface border border-border/20 rounded-xl flex items-center justify-center mx-auto mb-2 hover:scale-110 transition-transform duration-300">
-              <svg className="w-6 h-6 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <p className="text-xs text-text-secondary">Secure</p>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 bg-surface border border-border/20 rounded-xl flex items-center justify-center mx-auto mb-2 hover:scale-110 transition-transform duration-300">
-              <svg className="w-6 h-6 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <p className="text-xs text-text-secondary">Fast</p>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 bg-surface border border-border/20 rounded-xl flex items-center justify-center mx-auto mb-2 hover:scale-110 transition-transform duration-300">
-              <svg className="w-6 h-6 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <p className="text-xs text-text-secondary">Reliable</p>
-          </div>
         </div>
       </div>
     </div>
