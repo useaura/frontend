@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeftIcon, UserIcon, CreditCardIcon, ShieldCheckIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { Modal } from '../../components/Modal';
 
 export const Settings = () => {
   const [settings, setSettings] = useState({
@@ -10,6 +11,12 @@ export const Settings = () => {
     panicMode: false,
     reversePinPanic: true,
   });
+  const [isPinFlowOpen, setIsPinFlowOpen] = useState(false);
+  const [oldPin, setOldPin] = useState('');
+  const [newPin, setNewPin] = useState('');
+  const [confirmPin, setConfirmPin] = useState('');
+  const [showPinSuccess, setShowPinSuccess] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,15 +29,13 @@ export const Settings = () => {
 
   const handleSave = () => {
     console.log('Saving settings:', settings);
-    // In a real app, save to backend/localStorage
     navigate('/home', { state: { panicMode: settings.panicMode } });
   };
 
   const handlePanicModeToggle = () => {
     const newPanicMode = !settings.panicMode;
     setSettings({ ...settings, panicMode: newPanicMode });
-    
-    // Show confirmation for enabling panic mode
+
     if (newPanicMode) {
       if (confirm('Are you sure you want to enable Panic Mode? This will disable all transactions.')) {
         setSettings({ ...settings, panicMode: true });
@@ -40,81 +45,91 @@ export const Settings = () => {
     }
   };
 
+  const resetPinFlow = () => {
+    setOldPin('');
+    setNewPin('');
+    setConfirmPin('');
+    setIsPinFlowOpen(false);
+  };
+
+  const canSavePin = () => {
+    const pinRegex = /^\d{4}$/;
+    return pinRegex.test(oldPin) && pinRegex.test(newPin) && newPin === confirmPin;
+  };
+
+  const handleSavePin = () => {
+    if (!canSavePin()) return;
+    console.log('Updating PIN', { oldPin, newPin });
+    resetPinFlow();
+    setShowPinSuccess(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-border/30">
-        <button onClick={() => navigate('/home')} className="p-2 hover:bg-surface-secondary transition-colors hover:scale-105">
+        <button onClick={() => navigate('/home')} className="p-2 hover:bg-surface-secondary transition-colors">
           <ArrowLeftIcon className="w-6 h-6 text-text-primary" />
         </button>
-        <h1 className="text-xl font-semibold text-text-primary">Settings</h1>
+        <h1 className="text-lg font-medium text-text-primary">Settings</h1>
         <button 
           onClick={handleSave}
-          className="text-text-primary font-medium hover:text-text-secondary transition-colors hover:scale-105"
+          className="px-3 py-1 border border-border rounded-xl text-sm text-text-primary hover:bg-surface-secondary transition-colors"
         >
           Save
         </button>
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-6 py-8 space-y-8">
-        {/* Profile Settings */}
-        <div className="space-y-6 animate-fade-in">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
-              <UserIcon className="w-5 h-5 text-text-primary" />
+      <div className="flex-1 px-0 py-8 space-y-8">
+        {/* Profile */}
+        <div className="bg-surface-primary border border-border/20 p-6 shadow-sm rounded-xl">
+          <h2 className="text-sm font-semibold text-text-secondary mb-4">Profile</h2>
+          <label className="block text-sm font-medium text-text-secondary mb-2">
+            Display Name
+          </label>
+          <input
+            type="text"
+            value={settings.name}
+            onChange={(e) => setSettings({ ...settings, name: e.target.value })}
+            className="input-field"
+          />
+        </div>
+
+        {/* Card Limits */}
+        <div className="bg-surface-primary border border-border/20 p-6 shadow-sm rounded-xl">
+          <h2 className="text-sm font-semibold text-text-secondary mb-4">Card Limits</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-text-secondary mb-2">
+                Daily Limit (USDC)
+              </label>
+              <input
+                type="number"
+                value={settings.dailyLimit}
+                onChange={(e) => setSettings({ ...settings, dailyLimit: e.target.value })}
+                className="input-field"
+              />
             </div>
-            <h2 className="text-xl font-semibold text-text-primary">Profile Settings</h2>
-          </div>
-          
-          <div className="bg-surface-primary border border-border/20 p-6 shadow-sm rounded-xl">
-            <label className="block text-sm font-medium text-text-secondary mb-3">
-              Display Name
-            </label>
-            <input
-              type="text"
-              value={settings.name}
-              onChange={(e) => setSettings({ ...settings, name: e.target.value })}
-              className="input-field"
-            />
+            <div>
+              <label className="block text-sm font-medium text-text-secondary mb-2">
+                Monthly Limit (USDC)
+              </label>
+              <input
+                type="number"
+                value={settings.monthlyLimit}
+                onChange={(e) => setSettings({ ...settings, monthlyLimit: e.target.value })}
+                className="input-field"
+              />
+            </div>
           </div>
         </div>
 
-        {/* Card Settings */}
-        <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
-              <CreditCardIcon className="w-5 h-5 text-text-primary" />
-            </div>
-            <h2 className="text-xl font-semibold text-text-primary">Card Settings</h2>
-          </div>
-          
-          <div className="bg-surface-primary border border-border/20 p-6 shadow-sm rounded-xl">
-            <label className="block text-sm font-medium text-text-secondary mb-3">
-              Daily Transaction Limit (USDC)
-            </label>
-            <input
-              type="number"
-              value={settings.dailyLimit}
-              onChange={(e) => setSettings({ ...settings, dailyLimit: e.target.value })}
-              className="input-field"
-            />
-          </div>
-          
-          <div className="bg-surface-primary border border-border/20 p-6 shadow-sm rounded-xl">
-            <label className="block text-sm font-medium text-text-secondary mb-3">
-              Monthly Transaction Limit (USDC)
-            </label>
-            <input
-              type="number"
-              value={settings.monthlyLimit}
-              onChange={(e) => setSettings({ ...settings, monthlyLimit: e.target.value })}
-              className="input-field"
-            />
-          </div>
-          
-          <div className="bg-surface-primary border border-border/20 p-6 shadow-sm rounded-xl">
-            <div className="flex items-center justify-between">
+        {/* Toggles */}
+        <div className="bg-surface-primary border border-border/20 p-2 shadow-sm rounded-xl">
+          <h2 className="px-4 pt-4 pb-2 text-sm font-semibold text-text-secondary">Controls</h2>
+          <div className="divide-y divide-border/20">
+            <div className="flex items-center justify-between px-4 py-4">
               <div>
                 <div className="font-medium text-text-primary">Panic Mode</div>
                 <div className="text-sm text-text-secondary">Disable all transactions</div>
@@ -122,76 +137,121 @@ export const Settings = () => {
               <button
                 onClick={handlePanicModeToggle}
                 className={`w-14 h-7 transition-all duration-300 ${
-                  settings.panicMode ? 'bg-surface-tertiary' : 'bg-surface-secondary'
-                }`}
+                  settings.panicMode ? 'bg-red-600' : 'bg-surface-secondary'
+                } rounded-xl`}
               >
                 <div className={`w-6 h-6 bg-surface transition-transform duration-300 ${
                   settings.panicMode ? 'translate-x-7' : 'translate-x-1'
-                }`} />
+                } rounded-xl`} />
+              </button>
+            </div>
+            <div className="flex items-center justify-between px-4 py-4">
+              <div>
+                <div className="font-medium text-text-primary">Reverse PIN triggers Panic Mode</div>
+                <div className="text-sm text-text-secondary">Enter PIN backwards to activate panic mode</div>
+              </div>
+              <button
+                onClick={() => setSettings({ ...settings, reversePinPanic: !settings.reversePinPanic })}
+                className={`w-14 h-7 transition-all duration-300 ${
+                  settings.reversePinPanic ? 'bg-blue-600' : 'bg-surface-secondary'
+                } rounded-xl`}
+              >
+                <div className={`w-6 h-6 bg-surface transition-transform duration-300 ${
+                  settings.reversePinPanic ? 'translate-x-7' : 'translate-x-1'
+                } rounded-xl`} />
               </button>
             </div>
           </div>
         </div>
 
         {/* Security */}
-        <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
-              <ShieldCheckIcon className="w-5 h-5 text-text-primary" />
-            </div>
-            <h2 className="text-xl font-semibold text-text-primary">Security</h2>
-          </div>
-          
-          <button className="w-full text-left bg-surface-primary border border-border/20 p-6 shadow-sm hover:border-border/40 transition-colors rounded-xl">
+        <div className="bg-surface-primary border border-border/20 p-2 shadow-sm rounded-xl">
+          <h2 className="px-4 pt-4 pb-2 text-sm font-semibold text-text-secondary">Security</h2>
+          <button
+            onClick={() => setIsPinFlowOpen(true)}
+            className="w-full text-left px-4 py-4 hover:bg-surface-secondary transition-colors"
+          >
             <div className="font-medium text-text-primary">Change Card PIN</div>
             <div className="text-sm text-text-secondary">Update your 4-digit PIN</div>
           </button>
-          
-          <div className="bg-surface-primary border border-border/20 p-6 shadow-sm rounded-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="font-medium text-text-primary">Reverse PIN Trigger Panic Mode</div>
-                <div className="text-sm text-text-secondary">Enter PIN backwards to activate panic mode</div>
-              </div>
-              <button
-                onClick={() => setSettings({ ...settings, reversePinPanic: !settings.reversePinPanic })}
-                className={`w-14 h-7 transition-all duration-300 ${
-                  settings.reversePinPanic ? 'bg-surface-tertiary' : 'bg-surface-secondary'
-                }`}
-              >
-                <div className={`w-6 h-6 bg-surface transition-transform duration-300 ${
-                  settings.reversePinPanic ? 'translate-x-7' : 'translate-x-1'
-                }`} />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* About & Help */}
-        <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
-              <InformationCircleIcon className="w-5 h-5 text-text-primary" />
-            </div>
-            <h2 className="text-xl font-semibold text-text-primary">About & Help</h2>
-          </div>
-          
-          <button className="w-full text-left bg-surface-primary border border-border/20 p-6 shadow-sm hover:border-border/40 transition-colors rounded-xl">
-            <div className="font-medium text-text-primary">FAQs</div>
-            <div className="text-sm text-text-secondary">Frequently asked questions</div>
-          </button>
-          
-          <button className="w-full text-left bg-surface-primary border border-border/20 p-6 shadow-sm hover:border-border/40 transition-colors rounded-xl">
-            <div className="font-medium text-text-primary">Contact Support</div>
-            <div className="text-sm text-text-secondary">Get help from our team</div>
-          </button>
-          
-          <button className="w-full text-left bg-surface-primary border border-border/20 p-6 shadow-sm hover:border-border/40 transition-colors rounded-xl">
-            <div className="font-medium text-text-primary">Terms of Service</div>
-            <div className="text-sm text-text-secondary">Read our terms and conditions</div>
-          </button>
         </div>
       </div>
+
+      {/* Change PIN Modal */}
+      {isPinFlowOpen && (
+        <div className="modal-overlay" onClick={resetPinFlow}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold mb-4 text-text-primary">Change Card PIN</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-text-secondary mb-2">Current PIN</label>
+                <input
+                  type="password"
+                  value={oldPin}
+                  onChange={(e) => setOldPin(e.target.value.replace(/[^0-9]/g, '').slice(0, 4))}
+                  className="input-field"
+                  placeholder="••••"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-text-secondary mb-2">New PIN</label>
+                  <input
+                    type="password"
+                    value={newPin}
+                    onChange={(e) => setNewPin(e.target.value.replace(/[^0-9]/g, '').slice(0, 4))}
+                    className="input-field"
+                    placeholder="••••"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-text-secondary mb-2">Confirm PIN</label>
+                  <input
+                    type="password"
+                    value={confirmPin}
+                    onChange={(e) => setConfirmPin(e.target.value.replace(/[^0-9]/g, '').slice(0, 4))}
+                    className="input-field"
+                    placeholder="••••"
+                  />
+                </div>
+              </div>
+              {!canSavePin() && (
+                <p className="text-sm text-text-secondary">Enter 4 digits for each field. New PINs must match.</p>
+              )}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={resetPinFlow}
+                  className="flex-1 py-3 px-4 bg-surface-secondary text-text-primary rounded-xl font-medium hover:bg-surface-tertiary transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSavePin}
+                  disabled={!canSavePin()}
+                  className={`flex-1 py-3 px-4 rounded-xl font-medium transition-colors ${
+                    canSavePin()
+                      ? 'bg-text-primary text-background hover:bg-text-secondary'
+                      : 'bg-surface-secondary text-text-tertiary cursor-not-allowed'
+                  }`}
+                >
+                  Save PIN
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      <Modal
+        isOpen={showPinSuccess}
+        onClose={() => setShowPinSuccess(false)}
+        type="success"
+        title="PIN Updated"
+        message="Your card PIN has been updated successfully."
+        actionText="Done"
+        onAction={() => setShowPinSuccess(false)}
+      />
     </div>
   );
 };
