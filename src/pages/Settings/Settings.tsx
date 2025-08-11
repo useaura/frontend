@@ -8,7 +8,7 @@ export const Settings = () => {
     name: 'John Doe',
     dailyLimit: '1000',
     monthlyLimit: '10000',
-    panicMode: false,
+    panicMode: true,
     reversePinPanic: true,
   });
   const [isPinFlowOpen, setIsPinFlowOpen] = useState(false);

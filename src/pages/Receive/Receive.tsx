@@ -168,6 +168,17 @@ export const Receive = () => {
     }
   };
 
+  const handleBack = () => {
+    if (currentStep === 'options') {
+      navigate('/home');
+      return;
+    }
+    if (currentStep === 'address') setCurrentStep('options');
+    else if (currentStep === 'card-amount') setCurrentStep('options');
+    else if (currentStep === 'card-waiting') setCurrentStep('card-amount');
+    else if (currentStep === 'card-pin') setCurrentStep('card-waiting');
+  };
+
   const handleContinue = () => {
     if (currentStep === 'card-amount') {
       if (receiveData.amount) {
@@ -186,19 +197,9 @@ export const Receive = () => {
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border/20">
-        {currentStep !== 'options' && (
-          <button
-            onClick={() => {
-              if (currentStep === 'address') setCurrentStep('options');
-              else if (currentStep === 'card-amount') setCurrentStep('options');
-              else if (currentStep === 'card-waiting') setCurrentStep('card-amount');
-              else if (currentStep === 'card-pin') setCurrentStep('card-waiting');
-            }}
-            className="p-2"
-          >
-            <ArrowLeftIcon className="w-6 h-6 text-text-primary" />
-          </button>
-        )}
+        <button onClick={handleBack} className="p-2">
+          <ArrowLeftIcon className="w-6 h-6 text-text-primary" />
+        </button>
         <h1 className="text-lg font-semibold text-text-primary">{getStepTitle()}</h1>
         <div className="w-10" />
       </div>
@@ -218,10 +219,10 @@ export const Receive = () => {
           <button
             onClick={handleContinue}
             disabled={!canContinue()}
-            className={`w-full py-4 rounded-xl font-bold ${
+            className={`w-full py-4 rounded-xl font-bold transition-colors ${
               canContinue()
-                ? 'bg-surface border border-border text-text-primary'
-                : 'bg-surface-secondary text-text-tertiary cursor-not-allowed'
+                ? 'bg-surface border border-border text-text-primary hover:bg-surface-secondary'
+                : 'bg-blue-500/10 text-text-secondary border border-blue-500/20 cursor-not-allowed'
             }`}
           >
             Continue

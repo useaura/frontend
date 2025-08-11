@@ -19,9 +19,7 @@ export const Home = () => {
 
   const handleReceive = () => {
     if (!isPanicMode) {
-      // Simulate success action
-      setShowSuccessModal(true);
-      setTimeout(() => navigate('/receive'), 1000);
+      navigate('/receive');
     } else {
       setShowErrorModal(true);
     }
@@ -29,9 +27,7 @@ export const Home = () => {
 
   const handleWithdraw = () => {
     if (!isPanicMode) {
-      // Simulate success action
-      setShowSuccessModal(true);
-      setTimeout(() => navigate('/withdraw'), 1000);
+      navigate('/withdraw');
     } else {
       setShowErrorModal(true);
     }

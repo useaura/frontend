@@ -30,6 +30,15 @@ export const Withdraw = () => {
     }
   };
 
+  const handleBack = () => {
+    if (currentStep === 'details') {
+      navigate('/home');
+      return;
+    }
+    if (currentStep === 'preview') setCurrentStep('details');
+    else if (currentStep === 'pin') setCurrentStep('preview');
+  };
+
   const renderDetailsStep = () => (
     <>
       <div className="mb-6">
@@ -139,14 +148,9 @@ export const Withdraw = () => {
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border/20">
-        {currentStep !== 'details' && (
-          <button
-            onClick={() => setCurrentStep(currentStep === 'preview' ? 'details' : 'preview')}
-            className="p-2"
-          >
-            <ArrowLeftIcon className="w-6 h-6 text-text-primary" />
-          </button>
-        )}
+        <button onClick={handleBack} className="p-2">
+          <ArrowLeftIcon className="w-6 h-6 text-text-primary" />
+        </button>
         <h1 className="text-lg font-semibold text-text-primary">{getStepTitle()}</h1>
         <div className="w-10" />
       </div>
