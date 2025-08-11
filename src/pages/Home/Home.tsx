@@ -45,6 +45,67 @@ export const Home = () => {
     navigate('/transactions');
   };
 
+  type Tx = {
+    id: string;
+    direction: 'credit' | 'debit';
+    counterparty: string;
+    amount: string;
+    status: 'completed' | 'pending' | 'failed';
+    label: string;
+  };
+
+  const recentTransactions: Tx[] = [
+    { id: '1', direction: 'credit', counterparty: 'Alice', amount: '+50 USDC', status: 'completed', label: 'Received' },
+    { id: '2', direction: 'debit', counterparty: 'Bob', amount: '-20 USDC', status: 'pending', label: 'Sent' },
+  ];
+
+  const computeClasses = (status: Tx['status'], direction: Tx['direction']) => {
+    // Pending always yellow
+    if (status === 'pending') {
+      return {
+        bg: 'bg-yellow-500/10',
+        text: 'text-yellow-400',
+        border: 'border-yellow-500/20',
+        dot: 'bg-yellow-400',
+        amount: 'text-yellow-400',
+        stripe: 'border-l-yellow-500',
+      };
+    }
+
+    // Failed always red
+    if (status === 'failed') {
+      return {
+        bg: 'bg-red-500/10',
+        text: 'text-red-400',
+        border: 'border-red-500/20',
+        dot: 'bg-red-400',
+        amount: 'text-red-400',
+        stripe: 'border-l-red-500',
+      };
+    }
+
+    // Completed: green for credit, red for debit
+    if (direction === 'credit') {
+      return {
+        bg: 'bg-green-500/10',
+        text: 'text-green-400',
+        border: 'border-green-500/20',
+        dot: 'bg-green-400',
+        amount: 'text-green-400',
+        stripe: 'border-l-green-500',
+      };
+    }
+
+    return {
+      bg: 'bg-red-500/10',
+      text: 'text-red-400',
+      border: 'border-red-500/20',
+      dot: 'bg-red-400',
+      amount: 'text-red-400',
+      stripe: 'border-l-red-500',
+    };
+  };
+
   return (
     <>
       {/* Mobile Restriction Warning */}
@@ -62,8 +123,7 @@ export const Home = () => {
         <div className="px-6 py-8">
           <div className="flex items-center justify-between mb-8 animate-fade-in">
             <div>
-              <h1 className="text-2xl font-bold text-text-primary">Hi, User</h1>
-              <p className="text-text-secondary">Welcome back!</p>
+              <h1 className="text-lg font-medium text-text-primary">Hi, User</h1>
             </div>
             <button 
               onClick={handleSettings}
@@ -94,18 +154,10 @@ export const Home = () => {
           <div className="bg-surface border border-border/20 rounded-xl p-8 mb-8 text-center shadow-sm animate-slide-up" style={{ animationDelay: '0.1s' }}>
             {isPanicMode ? (
               <div className="text-text-secondary">
-                <div className="text-4xl font-bold mb-2">$0.00</div>
-                <div className="text-text-secondary">Available Balance</div>
+                <div className="text-4xl font-bold">$0.00</div>
               </div>
             ) : (
-              <>
-                <div className="text-4xl font-bold text-text-primary mb-2">$1,250.00</div>
-                <div className="text-text-secondary mb-4">Available Balance</div>
-                <div className="flex items-center justify-center gap-2 text-text-secondary">
-                  <ArrowUpIcon className="w-4 h-4" />
-                  <span className="text-sm font-medium">+2.5% from last month</span>
-                </div>
-              </>
+              <div className="text-4xl font-bold text-text-primary">$1,250.00</div>
             )}
           </div>
 
@@ -162,40 +214,36 @@ export const Home = () => {
               </button>
             </div>
             
-            <div className="space-y-4">
-              {/* Transaction 1 */}
-              <div className="flex items-center justify-between p-4 bg-surface-secondary border border-border/20 rounded-xl hover:border-border/40 transition-all duration-300 hover:scale-105">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
-                    <ArrowDownIcon className="w-5 h-5 text-text-primary" />
+            <div className="grid gap-4 sm:grid-cols-2">
+              {recentTransactions.map((tx) => {
+                const c = computeClasses(tx.status, tx.direction);
+                return (
+                  <div
+                    key={tx.id}
+                    className={`flex items-center justify-between p-4 bg-surface-secondary border ${c.border} rounded-xl hover:border-border/40 transition-all duration-300 hover:scale-[1.01] ${c.stripe} border-l-4`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
+                        {tx.direction === 'credit' ? (
+                          <ArrowDownIcon className={`w-5 h-5 ${c.amount}`} />
+                        ) : (
+                          <ArrowUpIcon className={`w-5 h-5 ${c.amount}`} />
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-medium text-text-primary">
+                          {tx.direction === 'credit' ? 'From' : 'To'}: {tx.counterparty}
+                        </div>
+                        <div className={`text-xs inline-flex items-center gap-2 px-2 py-0.5 border rounded-full ${c.bg} ${c.text} ${c.border}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`}></span>
+                          <span className="capitalize">{tx.status}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={`font-bold ${c.amount}`}>{tx.amount}</div>
                   </div>
-                  <div>
-                    <div className="font-medium text-text-primary">From: Alice</div>
-                    <div className="text-sm text-text-secondary">Received</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-text-primary">+50 USDC</div>
-                  <div className="text-xs text-text-tertiary">Completed</div>
-                </div>
-              </div>
-              
-              {/* Transaction 2 */}
-              <div className="flex items-center justify-between p-4 bg-surface-secondary border border-border/20 rounded-xl hover:border-border/40 transition-all duration-300 hover:scale-105">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
-                    <ArrowUpIcon className="w-5 h-5 text-text-primary" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-text-primary">To: Bob</div>
-                    <div className="text-sm text-text-secondary">Sent</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-text-primary">-20 USDC</div>
-                  <div className="text-xs text-text-tertiary">Pending</div>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
         </div>
