@@ -1,7 +1,9 @@
-import AppRoutes from "./routes/AppRoutes";
+import AppRoutes from './routes/AppRoutes';
 
-function App() {
-  return <AppRoutes />;
-}
+const App = () => (
+  <div className="bg-background min-h-screen font-sans">
+    <AppRoutes />
+  </div>
+);
 
 export default App;
