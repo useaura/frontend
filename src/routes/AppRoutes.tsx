@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Landing } from "../pages/Landing/Landing";
 import { Home } from "../pages/Home/Home";
 import { Splash } from "../pages/Splash/Splash";
 import { Auth } from "../pages/Auth/Auth";
@@ -11,7 +12,8 @@ const AppRoutes = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Splash />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/splash" element={<Splash />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/home" element={<Home />} />
         <Route path="/withdraw" element={<Withdraw />} />

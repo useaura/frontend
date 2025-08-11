@@ -14,37 +14,141 @@
 
 @layer components {
   .glass-effect {
-    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-soft;
+    @apply bg-surface/80 backdrop-blur-md border border-border/30 shadow-sm;
   }
   
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-medium hover:-translate-y-1;
+    @apply transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-border/60;
   }
   
   .button-primary {
-    @apply bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold py-4 px-6 rounded-2xl shadow-glow hover:shadow-large transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0;
+    @apply bg-surface text-text-primary font-semibold py-4 px-6 rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 hover:scale-105;
   }
   
   .button-secondary {
-    @apply bg-white text-text-primary font-semibold py-4 px-6 rounded-2xl border border-border shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0;
+    @apply bg-surface text-text-primary font-semibold py-4 px-6 rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 hover:border-border/60;
   }
   
   .input-field {
-    @apply w-full bg-white border border-border rounded-2xl px-4 py-4 text-text-primary placeholder-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200;
+    @apply w-full bg-surface border border-border rounded-xl px-4 py-3 text-text-primary placeholder-text-tertiary focus:outline-none focus:ring-2 focus:ring-border/30 focus:border-border/60 transition-all duration-200 hover:border-border/60;
+  }
+  
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4;
+  }
+  
+  .modal-content {
+    @apply bg-surface border border-border rounded-xl p-6 shadow-lg max-w-md w-full animate-scale-in;
+  }
+  
+  .success-icon {
+    @apply w-16 h-16 bg-surface border border-border rounded-xl flex items-center justify-center mx-auto mb-4;
+  }
+  
+  .error-icon {
+    @apply w-16 h-16 bg-surface border border-border rounded-xl flex items-center justify-center mx-auto mb-4;
+  }
+  
+  .shimmer-effect {
+    @apply relative overflow-hidden bg-gradient-to-r from-transparent via-border/10 to-transparent;
+  }
+  
+  .shimmer-effect::before {
+    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-border/20 to-transparent;
+    content: '';
+  }
+
+  /* Landing page specific styles */
+  .landing-page {
+    @apply min-h-screen;
+  }
+
+  .landing-hero {
+    @apply text-center py-20;
+  }
+
+  .landing-section {
+    @apply py-20;
+  }
+
+  .landing-feature-card {
+    @apply bg-surface border border-border/20 rounded-xl p-8 hover:border-border/40 transition-all duration-300 hover:scale-105;
   }
 }
 
-#mobile-only-warning {
+/* Mobile restriction - only applies to app routes, not landing page */
+.app-route {
   @apply hidden fixed z-[9999] inset-0 bg-background/95 text-text-primary items-center justify-center text-lg flex-col text-center p-8 backdrop-blur-md;
 }
 
 @media (min-width: 600px) {
-  #root > * {
+  /* Only apply mobile restriction to app routes */
+  .app-route {
+    @apply flex;
+  }
+  
+  /* Hide app content on desktop for app routes only */
+  .app-content {
     filter: blur(4px) grayscale(0.7);
     pointer-events: none;
     user-select: none;
   }
-  #mobile-only-warning {
-    @apply flex;
+}
+
+/* Animation classes */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px); 
   }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes scale-in {
+  from { 
+    opacity: 0; 
+    transform: scale(0.9); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.6s ease-out;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
 }

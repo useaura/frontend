@@ -41,139 +41,154 @@ export const Settings = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
-        <button onClick={() => navigate('/home')} className="p-2">
-          <ArrowLeftIcon className="w-6 h-6 text-white" />
+      <div className="flex items-center justify-between p-6 border-b border-border/30">
+        <button onClick={() => navigate('/home')} className="p-2 hover:bg-surface-secondary transition-colors hover:scale-105">
+          <ArrowLeftIcon className="w-6 h-6 text-text-primary" />
         </button>
-        <h1 className="text-lg font-semibold">Settings</h1>
-        <button onClick={handleSave} className="text-primary font-medium">
+        <h1 className="text-xl font-semibold text-text-primary">Settings</h1>
+        <button 
+          onClick={handleSave}
+          className="text-text-primary font-medium hover:text-text-secondary transition-colors hover:scale-105"
+        >
           Save
         </button>
       </div>
 
       {/* Content */}
-      <div className="flex-1 px-4 py-6 space-y-6">
+      <div className="flex-1 px-6 py-8 space-y-8">
         {/* Profile Settings */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <UserIcon className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-semibold">Profile Settings</h2>
+        <div className="space-y-6 animate-fade-in">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
+              <UserIcon className="w-5 h-5 text-text-primary" />
+            </div>
+            <h2 className="text-xl font-semibold text-text-primary">Profile Settings</h2>
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+          <div className="bg-surface-primary border border-border/20 p-6 shadow-sm rounded-xl">
+            <label className="block text-sm font-medium text-text-secondary mb-3">
               Display Name
             </label>
             <input
               type="text"
               value={settings.name}
               onChange={(e) => setSettings({ ...settings, name: e.target.value })}
-              className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-primary"
+              className="input-field"
             />
           </div>
         </div>
 
         {/* Card Settings */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <CreditCardIcon className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-semibold">Card Settings</h2>
+        <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
+              <CreditCardIcon className="w-5 h-5 text-text-primary" />
+            </div>
+            <h2 className="text-xl font-semibold text-text-primary">Card Settings</h2>
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+          <div className="bg-surface-primary border border-border/20 p-6 shadow-sm rounded-xl">
+            <label className="block text-sm font-medium text-text-secondary mb-3">
               Daily Transaction Limit (USDC)
             </label>
             <input
               type="number"
               value={settings.dailyLimit}
               onChange={(e) => setSettings({ ...settings, dailyLimit: e.target.value })}
-              className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-primary"
+              className="input-field"
             />
           </div>
           
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+          <div className="bg-surface-primary border border-border/20 p-6 shadow-sm rounded-xl">
+            <label className="block text-sm font-medium text-text-secondary mb-3">
               Monthly Transaction Limit (USDC)
             </label>
             <input
               type="number"
               value={settings.monthlyLimit}
               onChange={(e) => setSettings({ ...settings, monthlyLimit: e.target.value })}
-              className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-primary"
+              className="input-field"
             />
           </div>
           
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="font-medium">Panic Mode</div>
-              <div className="text-sm text-gray-400">Disable all transactions</div>
+          <div className="bg-surface-primary border border-border/20 p-6 shadow-sm rounded-xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium text-text-primary">Panic Mode</div>
+                <div className="text-sm text-text-secondary">Disable all transactions</div>
+              </div>
+              <button
+                onClick={handlePanicModeToggle}
+                className={`w-14 h-7 transition-all duration-300 ${
+                  settings.panicMode ? 'bg-surface-tertiary' : 'bg-surface-secondary'
+                }`}
+              >
+                <div className={`w-6 h-6 bg-surface transition-transform duration-300 ${
+                  settings.panicMode ? 'translate-x-7' : 'translate-x-1'
+                }`} />
+              </button>
             </div>
-            <button
-              onClick={handlePanicModeToggle}
-              className={`w-12 h-6 rounded-full transition-colors ${
-                settings.panicMode ? 'bg-red-500' : 'bg-gray-600'
-              }`}
-            >
-              <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                settings.panicMode ? 'translate-x-6' : 'translate-x-0.5'
-              }`} />
-            </button>
           </div>
         </div>
 
         {/* Security */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <ShieldCheckIcon className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-semibold">Security</h2>
+        <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
+              <ShieldCheckIcon className="w-5 h-5 text-text-primary" />
+            </div>
+            <h2 className="text-xl font-semibold text-text-primary">Security</h2>
           </div>
           
-          <button className="w-full text-left bg-white/5 rounded-xl p-4 hover:bg-white/10 transition-colors">
-            <div className="font-medium">Change Card PIN</div>
-            <div className="text-sm text-gray-400">Update your 4-digit PIN</div>
+          <button className="w-full text-left bg-surface-primary border border-border/20 p-6 shadow-sm hover:border-border/40 transition-colors rounded-xl">
+            <div className="font-medium text-text-primary">Change Card PIN</div>
+            <div className="text-sm text-text-secondary">Update your 4-digit PIN</div>
           </button>
           
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="font-medium">Reverse PIN Trigger Panic Mode</div>
-              <div className="text-sm text-gray-400">Enter PIN backwards to activate panic mode</div>
+          <div className="bg-surface-primary border border-border/20 p-6 shadow-sm rounded-xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium text-text-primary">Reverse PIN Trigger Panic Mode</div>
+                <div className="text-sm text-text-secondary">Enter PIN backwards to activate panic mode</div>
+              </div>
+              <button
+                onClick={() => setSettings({ ...settings, reversePinPanic: !settings.reversePinPanic })}
+                className={`w-14 h-7 transition-all duration-300 ${
+                  settings.reversePinPanic ? 'bg-surface-tertiary' : 'bg-surface-secondary'
+                }`}
+              >
+                <div className={`w-6 h-6 bg-surface transition-transform duration-300 ${
+                  settings.reversePinPanic ? 'translate-x-7' : 'translate-x-1'
+                }`} />
+              </button>
             </div>
-            <button
-              onClick={() => setSettings({ ...settings, reversePinPanic: !settings.reversePinPanic })}
-              className={`w-12 h-6 rounded-full transition-colors ${
-                settings.reversePinPanic ? 'bg-primary' : 'bg-gray-600'
-              }`}
-            >
-              <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                settings.reversePinPanic ? 'translate-x-6' : 'translate-x-0.5'
-              }`} />
-            </button>
           </div>
         </div>
 
         {/* About & Help */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 mb-4">
-            <InformationCircleIcon className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-semibold">About & Help</h2>
+        <div className="space-y-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
+              <InformationCircleIcon className="w-5 h-5 text-text-primary" />
+            </div>
+            <h2 className="text-xl font-semibold text-text-primary">About & Help</h2>
           </div>
           
-          <button className="w-full text-left bg-white/5 rounded-xl p-4 hover:bg-white/10 transition-colors">
-            <div className="font-medium">FAQs</div>
-            <div className="text-sm text-gray-400">Frequently asked questions</div>
+          <button className="w-full text-left bg-surface-primary border border-border/20 p-6 shadow-sm hover:border-border/40 transition-colors rounded-xl">
+            <div className="font-medium text-text-primary">FAQs</div>
+            <div className="text-sm text-text-secondary">Frequently asked questions</div>
           </button>
           
-          <button className="w-full text-left bg-white/5 rounded-xl p-4 hover:bg-white/10 transition-colors">
-            <div className="font-medium">Contact Support</div>
-            <div className="text-sm text-gray-400">Get help from our team</div>
+          <button className="w-full text-left bg-surface-primary border border-border/20 p-6 shadow-sm hover:border-border/40 transition-colors rounded-xl">
+            <div className="font-medium text-text-primary">Contact Support</div>
+            <div className="text-sm text-text-secondary">Get help from our team</div>
           </button>
           
-          <button className="w-full text-left bg-white/5 rounded-xl p-4 hover:bg-white/10 transition-colors">
-            <div className="font-medium">Terms of Service</div>
-            <div className="text-sm text-gray-400">Read our terms and conditions</div>
+          <button className="w-full text-left bg-surface-primary border border-border/20 p-6 shadow-sm hover:border-border/40 transition-colors rounded-xl">
+            <div className="font-medium text-text-primary">Terms of Service</div>
+            <div className="text-sm text-text-secondary">Read our terms and conditions</div>
           </button>
         </div>
       </div>

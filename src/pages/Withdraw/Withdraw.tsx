@@ -33,7 +33,7 @@ export const Withdraw = () => {
   const renderDetailsStep = () => (
     <>
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-text-secondary mb-2">
           Receiver Wallet Address
         </label>
         <input
@@ -41,11 +41,11 @@ export const Withdraw = () => {
           value={withdrawData.receiverAddress}
           onChange={(e) => setWithdrawData({ ...withdrawData, receiverAddress: e.target.value })}
           placeholder="Enter wallet address"
-          className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-primary"
+          className="w-full bg-surface border border-border/20 rounded-xl px-4 py-3 text-text-primary placeholder-text-tertiary focus:outline-none focus:border-border/60"
         />
       </div>
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-text-secondary mb-2">
           Amount
         </label>
         <input
@@ -53,7 +53,7 @@ export const Withdraw = () => {
           value={withdrawData.amount}
           onChange={(e) => setWithdrawData({ ...withdrawData, amount: e.target.value })}
           placeholder="0.00"
-          className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-primary"
+          className="w-full bg-surface border border-border/20 rounded-xl px-4 py-3 text-text-primary placeholder-text-tertiary focus:outline-none focus:border-border/60"
         />
       </div>
     </>
@@ -61,29 +61,29 @@ export const Withdraw = () => {
 
   const renderPreviewStep = () => (
     <div className="mb-6">
-      <div className="bg-white/5 rounded-xl p-4 space-y-3">
+      <div className="bg-surface border border-border/20 rounded-xl p-4 space-y-3">
         <div className="flex justify-between">
-          <span className="text-gray-300">Amount:</span>
-          <span className="font-semibold">{withdrawData.amount} USDC</span>
+          <span className="text-text-secondary">Amount:</span>
+          <span className="font-semibold text-text-primary">{withdrawData.amount} USDC</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-300">Fee:</span>
-          <span className="font-semibold">{withdrawData.fee} USDC</span>
+          <span className="text-text-secondary">Fee:</span>
+          <span className="font-semibold text-text-primary">{withdrawData.fee} USDC</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-300">Receiver:</span>
-          <span className="font-semibold text-sm">
+          <span className="text-text-secondary">Receiver:</span>
+          <span className="font-semibold text-sm text-text-primary">
             {withdrawData.receiverAddress.slice(0, 8)}...{withdrawData.receiverAddress.slice(-6)}
           </span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-300">Chain:</span>
-          <span className="font-semibold">Ethereum</span>
+          <span className="text-text-secondary">Chain:</span>
+          <span className="font-semibold text-text-primary">Ethereum</span>
         </div>
       </div>
       <button
         onClick={() => setCurrentStep('details')}
-        className="text-primary text-sm font-medium mt-4"
+        className="text-text-primary text-sm font-medium mt-4"
       >
         Edit Details
       </button>
@@ -93,7 +93,7 @@ export const Withdraw = () => {
   const renderPinStep = () => (
     <div className="mb-6">
       <div className="text-center mb-6">
-        <p className="text-sm text-gray-300 mb-4">
+        <p className="text-sm text-text-secondary mb-4">
           This will authorise the withdrawal
         </p>
         <div className="flex justify-center gap-3">
@@ -101,7 +101,7 @@ export const Withdraw = () => {
             <div
               key={index}
               className={`w-4 h-4 rounded-full border-2 ${
-                index < pin.length ? 'bg-primary border-primary' : 'border-gray-400'
+                index < pin.length ? 'bg-surface border-border' : 'border-border/40'
               }`}
             />
           ))}
@@ -138,16 +138,16 @@ export const Withdraw = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
+      <div className="flex items-center justify-between p-4 border-b border-border/20">
         {currentStep !== 'details' && (
           <button
             onClick={() => setCurrentStep(currentStep === 'preview' ? 'details' : 'preview')}
             className="p-2"
           >
-            <ArrowLeftIcon className="w-6 h-6 text-white" />
+            <ArrowLeftIcon className="w-6 h-6 text-text-primary" />
           </button>
         )}
-        <h1 className="text-lg font-semibold">{getStepTitle()}</h1>
+        <h1 className="text-lg font-semibold text-text-primary">{getStepTitle()}</h1>
         <div className="w-10" />
       </div>
 
@@ -159,14 +159,14 @@ export const Withdraw = () => {
       </div>
 
       {/* Continue Button */}
-      <div className="p-4 border-t border-white/10">
+      <div className="p-4 border-t border-border/20">
         <button
           onClick={handleContinue}
           disabled={!canContinue()}
           className={`w-full py-4 rounded-xl font-bold ${
             canContinue()
-              ? 'bg-primary text-black'
-              : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              ? 'bg-surface border border-border text-text-primary'
+              : 'bg-surface-secondary text-text-tertiary cursor-not-allowed'
           }`}
         >
           Continue

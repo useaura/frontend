@@ -11,31 +11,32 @@ export const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 flex flex-col items-center justify-center px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary flex flex-col items-center justify-center px-4 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100 rounded-full opacity-30 blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-100 rounded-full opacity-30 blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-surface/10 rounded-full opacity-30 blur-3xl animate-float"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-surface/10 rounded-full opacity-30 blur-3xl animate-float" style={{ animationDelay: '1.5s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-surface/5 rounded-full opacity-20 blur-3xl animate-pulse-glow"></div>
       </div>
       
       {/* Main content */}
-      <div className="relative z-10 w-full max-w-md animate-slide-up">
+      <div className="relative z-10 w-full max-w-md animate-fade-in">
         {/* App Logo */}
         <div className="text-center mb-12">
-          <div className="w-24 h-24 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mb-4 shadow-glow mx-auto">
-            <span className="text-3xl font-bold text-white">A</span>
+          <div className="w-24 h-24 bg-surface border border-border rounded-xl flex items-center justify-center mb-4 shadow-sm mx-auto">
+            <span className="text-3xl font-bold text-text-primary">A</span>
           </div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold text-text-primary">
             AuraPay
           </h1>
         </div>
 
         {/* Sign In Card */}
-        <div className="glass-effect rounded-3xl p-8 card-hover">
+        <div className="bg-surface border border-border/20 rounded-xl p-8 shadow-sm animate-slide-up" style={{ animationDelay: '0.2s' }}>
           {/* Sign In Button */}
           <button
             onClick={handleGoogleSignIn}
-            className="w-full flex items-center justify-center gap-3 bg-white text-text-primary font-semibold py-4 px-6 rounded-2xl border border-border shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
+            className="w-full flex items-center justify-center gap-3 bg-surface text-text-primary font-semibold py-4 px-6 rounded-xl border border-border shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 hover:border-border/60 hover:scale-105"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -55,26 +56,26 @@ export const Auth = () => {
         </div>
         
         {/* Features */}
-        <div className="mt-8 grid grid-cols-3 gap-4">
+        <div className="mt-8 grid grid-cols-3 gap-4 animate-slide-up" style={{ animationDelay: '0.4s' }}>
           <div className="text-center">
-            <div className="w-12 h-12 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-2">
-              <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-surface border border-border/20 rounded-xl flex items-center justify-center mx-auto mb-2 hover:scale-110 transition-transform duration-300">
+              <svg className="w-6 h-6 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
             <p className="text-xs text-text-secondary">Secure</p>
           </div>
           <div className="text-center">
-            <div className="w-12 h-12 bg-accent-100 rounded-2xl flex items-center justify-center mx-auto mb-2">
-              <svg className="w-6 h-6 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-surface border border-border/20 rounded-xl flex items-center justify-center mx-auto mb-2 hover:scale-110 transition-transform duration-300">
+              <svg className="w-6 h-6 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
             <p className="text-xs text-text-secondary">Fast</p>
           </div>
           <div className="text-center">
-            <div className="w-12 h-12 bg-success-100 rounded-2xl flex items-center justify-center mx-auto mb-2">
-              <svg className="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-surface border border-border/20 rounded-xl flex items-center justify-center mx-auto mb-2 hover:scale-110 transition-transform duration-300">
+              <svg className="w-6 h-6 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
