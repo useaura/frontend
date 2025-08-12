@@ -1,7 +1,92 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Cog6ToothIcon, ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/outline';
 import { Modal } from '../../components/Modal';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      damping: 20,
+      stiffness: 300,
+    },
+  },
+};
+
+const balanceVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: "spring",
+      damping: 15,
+      stiffness: 200,
+      delay: 0.2,
+    },
+  },
+};
+
+const buttonVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      damping: 20,
+      stiffness: 300,
+    },
+  },
+  hover: {
+    scale: 1.05,
+    y: -2,
+    transition: {
+      type: "spring",
+      damping: 15,
+      stiffness: 400,
+    },
+  },
+  tap: {
+    scale: 0.95,
+  },
+};
+
+const transactionItemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      type: "spring",
+      damping: 20,
+      stiffness: 300,
+    },
+  },
+  hover: {
+    scale: 1.02,
+    transition: {
+      type: "spring",
+      damping: 25,
+      stiffness: 400,
+    },
+  },
+};
 
 export const Home = () => {
   const [isPanicMode, setIsPanicMode] = useState(false);
@@ -114,59 +199,78 @@ export const Home = () => {
       </div>
 
       {/* App Content */}
-      <div className="app-content min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary">
+      <motion.div
+        className="app-content min-h-screen bg-gradient-to-br from-background via-background-secondary to-background-tertiary"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Header */}
         <div className="px-6 py-8">
-          <div className="flex items-center justify-between mb-8 animate-fade-in">
+          <motion.div
+            className="flex items-center justify-between mb-8"
+            variants={itemVariants}
+          >
             <div>
               <h1 className="text-lg font-medium text-text-primary">Hi, User</h1>
             </div>
-            <button 
+            <motion.button 
               onClick={handleSettings}
-              className="w-12 h-12 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:border-border/60 hover:scale-105"
+              className="w-12 h-12 bg-surface border border-border rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-all duration-300 hover:border-border/60"
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
             >
-              <Cog6ToothIcon className="w-6 h-6 text-text-secondary" />
-            </button>
-          </div>
+              <Cog6ToothIcon className="w-6 h-6 text-text-primary" />
+            </motion.button>
+          </motion.div>
 
           {/* Panic Mode Banner */}
           {isPanicMode && (
-            <div className="bg-surface border border-border/20 rounded-xl p-4 mb-6 animate-slide-up">
+            <motion.div
+              className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: "spring", damping: 20, stiffness: 300 }}
+            >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5 text-text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="font-semibold text-text-primary">Panic Mode Active</p>
-                  <p className="text-sm text-text-secondary">Disable in Settings to resume activity</p>
-                </div>
+                <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                <span className="text-red-400 text-sm font-medium">
+                  Panic Mode Active – Disable in Settings to resume activity.
+                </span>
               </div>
-            </div>
+            </motion.div>
           )}
 
-          {/* Balance Card */}
-          <div className="bg-surface border border-border/20 rounded-xl p-8 mb-8 text-center shadow-sm animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            {isPanicMode ? (
-              <div className="text-text-secondary">
-                <div className="text-4xl font-bold">$0.00</div>
-              </div>
-            ) : (
-              <div className="text-4xl font-bold text-text-primary">$1,250.00</div>
-            )}
-          </div>
+          {/* Balance Display */}
+          <motion.div
+            className="text-center mb-8"
+            variants={balanceVariants}
+          >
+            <div className="mb-2">
+              <span className="text-sm text-text-secondary">Available Balance</span>
+            </div>
+            <div className="text-4xl font-bold text-text-primary mb-1">
+              {isPanicMode ? 'Insufficient funds' : '1,234.56 USDC'}
+            </div>
+          </motion.div>
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-4 mb-8 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            <button
+          <motion.div
+            className="grid grid-cols-2 gap-4 mb-8"
+            variants={containerVariants}
+          >
+            <motion.button
               onClick={handleReceive}
               disabled={isPanicMode}
-              className={`relative overflow-hidden rounded-xl p-6 transition-all duration-300 ${
+              className={`p-6 rounded-xl transition-all duration-300 ${
                 isPanicMode
                   ? 'bg-surface-secondary text-text-tertiary cursor-not-allowed'
-                  : 'bg-surface border border-border text-text-primary shadow-sm hover:shadow-md hover:-translate-y-1 hover:scale-105'
+                  : 'bg-surface border border-border text-text-primary shadow-sm hover:shadow-md'
               }`}
+              variants={buttonVariants}
+              whileHover={!isPanicMode ? "hover" : undefined}
+              whileTap={!isPanicMode ? "tap" : undefined}
             >
               <div className="flex flex-col items-center">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${
@@ -176,16 +280,19 @@ export const Home = () => {
                 </div>
                 <span className="font-semibold text-lg">Receive</span>
               </div>
-            </button>
-            
-            <button
+            </motion.button>
+
+            <motion.button
               onClick={handleWithdraw}
               disabled={isPanicMode}
-              className={`relative overflow-hidden rounded-xl p-6 transition-all duration-300 ${
+              className={`p-6 rounded-xl transition-all duration-300 ${
                 isPanicMode
                   ? 'bg-surface-secondary text-text-tertiary cursor-not-allowed'
-                  : 'bg-surface border border-border text-text-primary shadow-sm hover:shadow-md hover:-translate-y-1 hover:scale-105'
+                  : 'bg-surface border border-border text-text-primary shadow-sm hover:shadow-md'
               }`}
+              variants={buttonVariants}
+              whileHover={!isPanicMode ? "hover" : undefined}
+              whileTap={!isPanicMode ? "tap" : undefined}
             >
               <div className="flex flex-col items-center">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${
@@ -195,28 +302,42 @@ export const Home = () => {
                 </div>
                 <span className="font-semibold text-lg">Withdraw</span>
               </div>
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
 
           {/* Recent Transactions */}
-          <div className="bg-surface border border-border/20 rounded-xl p-6 shadow-sm animate-slide-up" style={{ animationDelay: '0.3s' }}>
-            <div className="flex items-center justify-between mb-6">
+          <motion.div
+            className="bg-surface border border-border/20 rounded-xl p-6 shadow-sm"
+            variants={itemVariants}
+          >
+            <motion.div
+              className="flex items-center justify-between mb-6"
+              variants={itemVariants}
+            >
               <h2 className="text-xl font-semibold text-text-primary">Recent Transactions</h2>
-              <button 
+              <motion.button 
                 onClick={handleTransactions}
-                className="text-text-primary text-sm font-medium hover:text-text-secondary transition-colors hover:scale-105"
+                className="text-text-primary text-sm font-medium hover:text-text-secondary transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 View All
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
             
-            <div className="grid gap-4 sm:grid-cols-2">
-              {recentTransactions.map((tx) => {
+            <motion.div
+              className="grid gap-4 sm:grid-cols-2"
+              variants={containerVariants}
+            >
+              {recentTransactions.map((tx, index) => {
                 const c = computeClasses(tx.status, tx.direction);
                 return (
-                  <div
+                  <motion.div
                     key={tx.id}
-                    className={`flex items-center justify-between p-4 bg-surface-secondary border ${c.border} rounded-xl hover:border-border/40 transition-all duration-300 hover:scale-[1.01] ${c.stripe} border-l-4`}
+                    className={`flex items-center justify-between p-4 bg-surface-secondary border ${c.border} rounded-xl hover:border-border/40 transition-all duration-300 ${c.stripe} border-l-4`}
+                    variants={transactionItemVariants}
+                    whileHover="hover"
+                    custom={index}
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
@@ -237,11 +358,11 @@ export const Home = () => {
                       </div>
                     </div>
                     <div className={`font-bold ${c.amount}`}>{tx.amount}</div>
-                  </div>
+                  </motion.div>
                 );
               })}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
 
         {/* Success Modal */}
@@ -268,7 +389,7 @@ export const Home = () => {
             navigate('/settings');
           }}
         />
-      </div>
+      </motion.div>
     </>
   );
 };
