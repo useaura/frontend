@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   LockClosedIcon,
   SparklesIcon,
@@ -162,32 +162,60 @@ export const Landing = () => {
         </div>
 
         {/* Mobile Menu */}
-        <motion.div
-          className="md:hidden mt-8 py-6 border-t border-border/20"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{
-            opacity: isMobileMenuOpen ? 1 : 0,
-            height: isMobileMenuOpen ? "auto" : 0,
-          }}
-          transition={{ duration: 0.3 }}
-        >
+        <AnimatePresence>
           {isMobileMenuOpen && (
-            <div className="flex flex-col space-y-6">
-              <a
-                href="#features"
-                className="text-text-secondary hover:text-text-primary transition-colors text-sm tracking-wide"
+            <motion.div
+              className="md:hidden overflow-hidden border-t border-border/20"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ 
+                height: "auto", 
+                opacity: 1,
+                transition: {
+                  height: { duration: 0.3, ease: "easeOut" },
+                  opacity: { duration: 0.2, delay: 0.1 }
+                }
+              }}
+              exit={{ 
+                height: 0, 
+                opacity: 0,
+                transition: {
+                  height: { duration: 0.3, ease: "easeIn" },
+                  opacity: { duration: 0.2 }
+                }
+              }}
+            >
+              <motion.div 
+                className="py-6 flex flex-col space-y-6"
+                initial={{ y: -10 }}
+                animate={{ y: 0 }}
+                exit={{ y: -10 }}
+                transition={{ duration: 0.2, delay: 0.1 }}
               >
-                FEATURES
-              </a>
-              <button
-                onClick={handleGetStarted}
-                className="bg-text-primary text-background px-8 py-3 text-sm tracking-wide hover:bg-text-secondary transition-colors text-left"
-              >
-                GET STARTED
-              </button>
-            </div>
+                <motion.a
+                  href="#features"
+                  className="text-text-secondary hover:text-text-primary transition-colors text-sm tracking-wide"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.2 }}
+                  whileHover={{ y: 5 }}
+                >
+                  FEATURES
+                </motion.a>
+                <motion.button
+                  onClick={handleGetStarted}
+                  className="bg-text-primary text-background px-8 py-3 text-sm tracking-wide hover:bg-text-secondary transition-colors text-left rounded"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.3 }}
+                  whileHover={{ scale: 1.02, y: 5 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  GET STARTED
+                </motion.button>
+              </motion.div>
+            </motion.div>
           )}
-        </motion.div>
+        </AnimatePresence>
       </motion.nav>
 
       {/* Hero Section */}
