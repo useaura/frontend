@@ -237,7 +237,7 @@ export const Landing = () => {
             className="text-lg text-text-secondary mb-12 max-w-2xl mx-auto tracking-wide"
             variants={heroVariants}
           >
-            Send and receive money instantly. Secure. Simple. Fast.
+            Send and receive money instantly with one tap. Secure. Simple. Fast.
           </motion.p>
           <motion.button
             onClick={handleGetStarted}
@@ -252,78 +252,103 @@ export const Landing = () => {
       </motion.section>
 
       {/* Features Section */}
-      <section id="features" className="px-8 py-32 bg-background">
+      <section id="features" className="px-8 py-32 bg-background-secondary/30">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            className="text-center mb-24"
+            className="text-center mb-20"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl font-light text-text-primary mb-6 tracking-wide">
-              WHY AURAPAY?
+            <motion.div
+              className="inline-block px-6 py-2 bg-text-primary/10 border border-text-primary/20 rounded-full mb-8"
+              whileHover={{ scale: 1.05 }}
+            >
+              <span className="text-text-primary text-sm tracking-wide font-medium">
+                FEATURES
+              </span>
+            </motion.div>
+            <h2 className="text-5xl font-light text-text-primary mb-6 tracking-wide">
+              WHY CHOOSE AURAPAY?
             </h2>
-            <p className="text-text-secondary text-lg tracking-wide max-w-2xl mx-auto">
-              Experience the next generation of digital payments
+            <p className="text-text-secondary text-xl tracking-wide max-w-3xl mx-auto leading-relaxed">
+              Built for the modern world with cutting-edge technology and user-first design
             </p>
           </motion.div>
 
-          {/* New Features Layout */}
-          <div className="space-y-16">
+          {/* Modern Grid Layout */}
+          <motion.div 
+            className="grid md:grid-cols-3 gap-8 lg:gap-12"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
             {features.map((feature, index) => (
               <motion.div
                 key={index}
-                className={`flex flex-col ${
-                  index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                } items-center gap-12 md:gap-20`}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
+                className="group relative"
+                variants={featureVariants}
+                whileHover={{ y: -10 }}
+                transition={{ type: "spring", damping: 20, stiffness: 300 }}
               >
-                {/* Icon Section */}
-                <div className="flex-1 flex justify-center">
+                {/* Background Card */}
+                <div className="absolute inset-0 bg-surface border border-border/20 rounded-2xl group-hover:border-text-primary/30 transition-all duration-500 group-hover:shadow-2xl group-hover:shadow-text-primary/5" />
+                
+                {/* Content */}
+                <div className="relative p-8 lg:p-10 text-center">
+                  {/* Icon Container */}
                   <motion.div
-                    className="relative"
-                    whileHover={{ scale: 1.05 }}
+                    className="relative mx-auto mb-8 w-20 h-20"
+                    whileHover={{ scale: 1.1, rotate: 5 }}
                     transition={{ type: "spring", damping: 15, stiffness: 300 }}
                   >
-                    <div className="w-32 h-32 bg-text-primary/5 border border-text-primary/20 rounded-full flex items-center justify-center">
-                      <div className="text-text-primary">{feature.icon}</div>
+                    {/* Icon Background */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-text-primary/20 to-text-primary/5 rounded-2xl group-hover:from-text-primary/30 group-hover:to-text-primary/10 transition-all duration-500" />
+                    
+                    {/* Icon */}
+                    <div className="relative w-full h-full flex items-center justify-center text-text-primary group-hover:scale-110 transition-transform duration-300">
+                      {feature.icon}
                     </div>
-                    {/* Decorative ring */}
+                    
+                    {/* Decorative Elements */}
                     <motion.div
-                      className="absolute inset-0 w-32 h-32 border border-text-primary/10 rounded-full"
+                      className="absolute -inset-2 border border-text-primary/10 rounded-2xl opacity-0 group-hover:opacity-100"
                       animate={{ rotate: 360 }}
                       transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                     />
                   </motion.div>
-                </div>
 
-                {/* Content Section */}
-                <motion.div
-                  className="flex-1 text-center md:text-left"
-                  variants={featureVariants}
-                >
+                  {/* Feature Number */}
                   <motion.div
-                    className="inline-block px-6 py-2 bg-text-primary/10 border border-text-primary/20 rounded-full mb-6"
+                    className="inline-block px-4 py-1 bg-text-primary/5 border border-text-primary/20 rounded-full mb-6 group-hover:bg-text-primary/10 group-hover:border-text-primary/30 transition-all duration-300"
                     whileHover={{ scale: 1.05 }}
                   >
-                    <span className="text-text-primary text-sm tracking-wide font-medium">
-                      0{index + 1}
+                    <span className="text-text-primary text-xs tracking-wider font-medium">
+                      {String(index + 1).padStart(2, '0')}
                     </span>
                   </motion.div>
-                  <h3 className="text-4xl font-light text-text-primary mb-6 tracking-wide">
+
+                  {/* Title */}
+                  <h3 className="text-2xl lg:text-3xl font-light text-text-primary mb-4 tracking-wide group-hover:text-text-primary transition-colors duration-300">
                     {feature.title}
                   </h3>
-                  <p className="text-text-secondary text-lg tracking-wide leading-relaxed max-w-md">
+
+                  {/* Description */}
+                  <p className="text-text-secondary text-base lg:text-lg tracking-wide leading-relaxed group-hover:text-text-secondary transition-colors duration-300">
                     {feature.description}
                   </p>
-                </motion.div>
+
+                  {/* Hover Accent */}
+                  <motion.div
+                    className="absolute bottom-0 left-1/2 w-0 h-1 bg-gradient-to-r from-text-primary/50 to-text-primary rounded-full group-hover:w-16 transition-all duration-500"
+                    style={{ transform: 'translateX(-50%)' }}
+                  />
+                </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
