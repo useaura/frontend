@@ -125,13 +125,39 @@ export const Landing = () => {
 
           {/* Mobile Menu Button */}
           <motion.button
-            className="md:hidden p-2"
+            className="md:hidden p-2 relative w-10 h-10 flex flex-col justify-center items-center"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             whileTap={{ scale: 0.95 }}
           >
-            <div className="w-6 h-1 bg-text-primary mb-1"></div>
-            <div className="w-6 h-1 bg-text-primary mb-1"></div>
-            <div className="w-6 h-1 bg-text-primary"></div>
+            {/* Top line */}
+            <motion.div
+              className="w-6 h-0.5 bg-text-primary absolute"
+              animate={{
+                rotate: isMobileMenuOpen ? 45 : 0,
+                y: isMobileMenuOpen ? 0 : -4,
+              }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            />
+            
+            {/* Middle line */}
+            <motion.div
+              className="w-6 h-0.5 bg-text-primary absolute"
+              animate={{
+                opacity: isMobileMenuOpen ? 0 : 1,
+                x: isMobileMenuOpen ? 10 : 0,
+              }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+            />
+            
+            {/* Bottom line */}
+            <motion.div
+              className="w-6 h-0.5 bg-text-primary absolute"
+              animate={{
+                rotate: isMobileMenuOpen ? -45 : 0,
+                y: isMobileMenuOpen ? 0 : 4,
+              }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            />
           </motion.button>
         </div>
 
