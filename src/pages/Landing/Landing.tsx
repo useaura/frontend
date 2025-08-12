@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { useNavigateWithLoading } from "../../hooks/useNavigateWithLoading";
 import {
   LockClosedIcon,
   SparklesIcon,
@@ -61,9 +62,13 @@ const buttonVariants = {
 export const Landing = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const navigateWithLoading = useNavigateWithLoading();
 
   const handleGetStarted = () => {
-    navigate("/auth");
+    navigateWithLoading("/auth", {
+      loadingMessage: "Preparing authentication...",
+      delay: 400
+    });
   };
 
   const features = [

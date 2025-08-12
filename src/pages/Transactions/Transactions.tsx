@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { useNavigateWithLoading } from '../../hooks/useNavigateWithLoading';
 import { ArrowLeftIcon, ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/outline';
+import { TransactionDetailsModal, type TransactionDetails } from '../../components/TransactionDetailsModal';
 
 type Transaction = {
   id: string;
@@ -93,6 +96,29 @@ const mockTransactions: Transaction[] = [
 
 export const Transactions = () => {
   const navigate = useNavigate();
+  const navigateWithLoading = useNavigateWithLoading();
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionDetails | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleTransactionClick = (transaction: Transaction) => {
+    // Convert Transaction to TransactionDetails format
+    const transactionDetails: TransactionDetails = {
+      ...transaction,
+      transactionHash: `0x${Math.random().toString(16).substr(2, 64)}`, // Mock hash
+      fee: '0.001 USDC',
+      network: 'Ethereum',
+      confirmations: transaction.status === 'completed' ? 12 : transaction.status === 'pending' ? 3 : 0,
+      timestamp: new Date(transaction.date).toISOString(),
+    };
+    
+    setSelectedTransaction(transactionDetails);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedTransaction(null);
+  };
 
   const computeClasses = (status: Transaction['status'], type: Transaction['type']) => {
     // Pending always yellow
@@ -165,7 +191,10 @@ export const Transactions = () => {
         transition={{ duration: 0.3, delay: 0.1 }}
       >
         <motion.button 
-          onClick={() => navigate('/home')} 
+          onClick={() => navigateWithLoading('/home', {
+            loadingMessage: "Returning to home...",
+            delay: 250
+          })} 
           className="p-2 hover:bg-surface rounded-xl transition-colors"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -189,10 +218,12 @@ export const Transactions = () => {
             return (
               <motion.div
                 key={transaction.id}
-                className={`flex items-center justify-between p-4 bg-surface-secondary border ${c.border} rounded-xl hover:border-border/40 transition-all duration-300 ${c.stripe} border-l-4`}
+                className={`flex items-center justify-between p-4 bg-surface-secondary border ${c.border} rounded-xl hover:border-border/40 transition-all duration-300 ${c.stripe} border-l-4 cursor-pointer`}
                 variants={transactionItemVariants}
                 whileHover="hover"
+                whileTap={{ scale: 0.98 }}
                 custom={index}
+                onClick={() => handleTransactionClick(transaction)}
               >
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
@@ -240,6 +271,13 @@ export const Transactions = () => {
           </motion.button>
         </motion.div>
       </div>
+
+      {/* Transaction Details Modal */}
+      <TransactionDetailsModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        transaction={selectedTransaction}
+      />
     </motion.div>
   );
 };

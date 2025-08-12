@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useNavigateWithLoading } from '../../hooks/useNavigateWithLoading';
 import { Cog6ToothIcon, ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/outline';
 import { Modal } from '../../components/Modal';
+import { TransactionDetailsModal, type TransactionDetails } from '../../components/TransactionDetailsModal';
 
 // Animation variants
 const containerVariants = {
@@ -92,7 +94,10 @@ export const Home = () => {
   const [isPanicMode, setIsPanicMode] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionDetails | null>(null);
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const navigate = useNavigate();
+  const navigateWithLoading = useNavigateWithLoading();
   const location = useLocation();
 
   // Sync panic mode from Settings page
@@ -104,7 +109,10 @@ export const Home = () => {
 
   const handleReceive = () => {
     if (!isPanicMode) {
-      navigate('/receive');
+      navigateWithLoading('/receive', {
+        loadingMessage: "Opening receive options...",
+        delay: 300
+      });
     } else {
       setShowErrorModal(true);
     }
@@ -112,18 +120,54 @@ export const Home = () => {
 
   const handleWithdraw = () => {
     if (!isPanicMode) {
-      navigate('/withdraw');
+      navigateWithLoading('/withdraw', {
+        loadingMessage: "Opening withdraw flow...",
+        delay: 300
+      });
     } else {
       setShowErrorModal(true);
     }
   };
 
-  const handleSettings = () => {
-    navigate('/settings', { state: { panicMode: isPanicMode } });
+  const handleTransactions = () => {
+    navigateWithLoading('/transactions', {
+      loadingMessage: "Loading transaction history...",
+      delay: 250
+    });
   };
 
-  const handleTransactions = () => {
-    navigate('/transactions');
+  const handleSettings = () => {
+    navigateWithLoading('/settings', {
+      state: { panicMode: isPanicMode },
+      loadingMessage: "Opening settings...",
+      delay: 300
+    });
+  };
+
+  const handleTransactionClick = (tx: Tx) => {
+    // Convert Tx to TransactionDetails format
+    const transactionDetails: TransactionDetails = {
+      id: tx.id,
+      type: tx.direction === 'credit' ? 'received' : 'sent',
+      counterparty: tx.counterparty,
+      amount: tx.amount,
+      date: new Date().toISOString(), // Mock date
+      status: tx.status,
+      narration: tx.label,
+      transactionHash: `0x${Math.random().toString(16).substr(2, 64)}`, // Mock hash
+      fee: '0.001 USDC',
+      network: 'Ethereum',
+      confirmations: tx.status === 'completed' ? 12 : tx.status === 'pending' ? 3 : 0,
+      timestamp: new Date().toISOString(),
+    };
+    
+    setSelectedTransaction(transactionDetails);
+    setIsTransactionModalOpen(true);
+  };
+
+  const closeTransactionModal = () => {
+    setIsTransactionModalOpen(false);
+    setSelectedTransaction(null);
   };
 
   type Tx = {
@@ -334,10 +378,12 @@ export const Home = () => {
                 return (
                   <motion.div
                     key={tx.id}
-                    className={`flex items-center justify-between p-4 bg-surface-secondary border ${c.border} rounded-xl hover:border-border/40 transition-all duration-300 ${c.stripe} border-l-4`}
+                    className={`flex items-center justify-between p-4 bg-surface-secondary border ${c.border} rounded-xl hover:border-border/40 transition-all duration-300 ${c.stripe} border-l-4 cursor-pointer`}
                     variants={transactionItemVariants}
                     whileHover="hover"
+                    whileTap={{ scale: 0.98 }}
                     custom={index}
+                    onClick={() => handleTransactionClick(tx)}
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
@@ -388,6 +434,13 @@ export const Home = () => {
             setShowErrorModal(false);
             navigate('/settings');
           }}
+        />
+
+        {/* Transaction Details Modal */}
+        <TransactionDetailsModal
+          isOpen={isTransactionModalOpen}
+          onClose={closeTransactionModal}
+          transaction={selectedTransaction}
         />
       </motion.div>
     </>
