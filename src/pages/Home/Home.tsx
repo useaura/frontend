@@ -21,7 +21,7 @@ const itemVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 20,
       stiffness: 300,
     },
@@ -34,7 +34,7 @@ const balanceVariants = {
     opacity: 1,
     scale: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 15,
       stiffness: 200,
       delay: 0.2,
@@ -48,7 +48,7 @@ const buttonVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 20,
       stiffness: 300,
     },
@@ -57,7 +57,7 @@ const buttonVariants = {
     scale: 1.05,
     y: -2,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 15,
       stiffness: 400,
     },
@@ -73,7 +73,7 @@ const transactionItemVariants = {
     opacity: 1,
     x: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 20,
       stiffness: 300,
     },
@@ -81,7 +81,7 @@ const transactionItemVariants = {
   hover: {
     scale: 1.02,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 25,
       stiffness: 400,
     },
