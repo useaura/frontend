@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useNavigateWithLoading } from '../../hooks/useNavigateWithLoading';
 import { ArrowLeftIcon, ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/outline';
 
 type Transaction = {
@@ -93,6 +94,7 @@ const mockTransactions: Transaction[] = [
 
 export const Transactions = () => {
   const navigate = useNavigate();
+  const navigateWithLoading = useNavigateWithLoading();
 
   const computeClasses = (status: Transaction['status'], type: Transaction['type']) => {
     // Pending always yellow
@@ -165,7 +167,10 @@ export const Transactions = () => {
         transition={{ duration: 0.3, delay: 0.1 }}
       >
         <motion.button 
-          onClick={() => navigate('/home')} 
+          onClick={() => navigateWithLoading('/home', {
+            loadingMessage: "Returning to home...",
+            delay: 250
+          })} 
           className="p-2 hover:bg-surface rounded-xl transition-colors"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}

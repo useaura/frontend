@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useNavigateWithLoading } from '../../hooks/useNavigateWithLoading';
 import { Cog6ToothIcon, ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/outline';
 import { Modal } from '../../components/Modal';
 
@@ -93,6 +94,7 @@ export const Home = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const navigate = useNavigate();
+  const navigateWithLoading = useNavigateWithLoading();
   const location = useLocation();
 
   // Sync panic mode from Settings page
@@ -104,7 +106,10 @@ export const Home = () => {
 
   const handleReceive = () => {
     if (!isPanicMode) {
-      navigate('/receive');
+      navigateWithLoading('/receive', {
+        loadingMessage: "Opening receive options...",
+        delay: 300
+      });
     } else {
       setShowErrorModal(true);
     }
@@ -112,18 +117,28 @@ export const Home = () => {
 
   const handleWithdraw = () => {
     if (!isPanicMode) {
-      navigate('/withdraw');
+      navigateWithLoading('/withdraw', {
+        loadingMessage: "Opening withdraw flow...",
+        delay: 300
+      });
     } else {
       setShowErrorModal(true);
     }
   };
 
-  const handleSettings = () => {
-    navigate('/settings', { state: { panicMode: isPanicMode } });
+  const handleTransactions = () => {
+    navigateWithLoading('/transactions', {
+      loadingMessage: "Loading transaction history...",
+      delay: 250
+    });
   };
 
-  const handleTransactions = () => {
-    navigate('/transactions');
+  const handleSettings = () => {
+    navigateWithLoading('/settings', {
+      state: { panicMode: isPanicMode },
+      loadingMessage: "Opening settings...",
+      delay: 300
+    });
   };
 
   type Tx = {
