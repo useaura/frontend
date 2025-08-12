@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeftIcon, ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/outline';
 
 type Transaction = {
@@ -9,6 +10,38 @@ type Transaction = {
   date: string;
   status: 'completed' | 'pending' | 'failed';
   narration?: string;
+};
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+    },
+  },
+};
+
+const transactionItemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      type: "spring" as const,
+      damping: 20,
+      stiffness: 300,
+    },
+  },
+  hover: {
+    scale: 1.02,
+    transition: {
+      type: "spring" as const,
+      damping: 25,
+      stiffness: 400,
+    },
+  },
 };
 
 const mockTransactions: Transaction[] = [
@@ -61,22 +94,51 @@ const mockTransactions: Transaction[] = [
 export const Transactions = () => {
   const navigate = useNavigate();
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'text-text-primary';
-      case 'pending': return 'text-text-secondary';
-      case 'failed': return 'text-text-tertiary';
-      default: return 'text-text-tertiary';
+  const computeClasses = (status: Transaction['status'], type: Transaction['type']) => {
+    // Pending always yellow
+    if (status === 'pending') {
+      return {
+        bg: 'bg-yellow-500/10',
+        text: 'text-yellow-400',
+        border: 'border-yellow-500/20',
+        dot: 'bg-yellow-400',
+        amount: 'text-yellow-400',
+        stripe: 'border-l-yellow-500',
+      };
     }
-  };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed': return '✓';
-      case 'pending': return '⏳';
-      case 'failed': return '✗';
-      default: return '';
+    // Failed always red
+    if (status === 'failed') {
+      return {
+        bg: 'bg-red-500/10',
+        text: 'text-red-400',
+        border: 'border-red-500/20',
+        dot: 'bg-red-400',
+        amount: 'text-red-400',
+        stripe: 'border-l-red-500',
+      };
     }
+
+    // Completed: green for received, red for sent
+    if (type === 'received') {
+      return {
+        bg: 'bg-green-500/10',
+        text: 'text-green-400',
+        border: 'border-green-500/20',
+        dot: 'bg-green-400',
+        amount: 'text-green-400',
+        stripe: 'border-l-green-500',
+      };
+    }
+
+    return {
+      bg: 'bg-red-500/10',
+      text: 'text-red-400',
+      border: 'border-red-500/20',
+      dot: 'bg-red-400',
+      amount: 'text-red-400',
+      stripe: 'border-l-red-500',
+    };
   };
 
   const formatDate = (dateString: string) => {
@@ -89,74 +151,95 @@ export const Transactions = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <motion.div 
+      className="flex flex-col min-h-screen bg-background"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border/20">
-        <button onClick={() => navigate('/home')} className="p-2">
+      <motion.div 
+        className="flex items-center justify-between p-4 border-b border-border/20"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+      >
+        <motion.button 
+          onClick={() => navigate('/home')} 
+          className="p-2 hover:bg-surface rounded-xl transition-colors"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           <ArrowLeftIcon className="w-6 h-6 text-text-primary" />
-        </button>
+        </motion.button>
         <h1 className="text-lg font-semibold text-text-primary">Transactions</h1>
         <div className="w-10" />
-      </div>
+      </motion.div>
 
       {/* Content */}
       <div className="flex-1 px-4 py-6">
-        <div className="space-y-3">
-          {mockTransactions.map((transaction) => (
-            <div
-              key={transaction.id}
-              className="bg-surface border border-border/20 rounded-xl p-4 hover:bg-surface-secondary transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {/* Transaction Icon */}
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                    transaction.type === 'received' ? 'bg-surface-secondary' : 'bg-surface-secondary'
-                  }`}>
+        <motion.div 
+          className="space-y-3"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {mockTransactions.map((transaction, index) => {
+            const c = computeClasses(transaction.status, transaction.type);
+            return (
+              <motion.div
+                key={transaction.id}
+                className={`flex items-center justify-between p-4 bg-surface-secondary border ${c.border} rounded-xl hover:border-border/40 transition-all duration-300 ${c.stripe} border-l-4`}
+                variants={transactionItemVariants}
+                whileHover="hover"
+                custom={index}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-surface border border-border/20 rounded-xl flex items-center justify-center">
                     {transaction.type === 'received' ? (
-                      <ArrowDownIcon className="w-5 h-5 text-text-primary" />
+                      <ArrowDownIcon className={`w-5 h-5 ${c.amount}`} />
                     ) : (
-                      <ArrowUpIcon className="w-5 h-5 text-text-primary" />
+                      <ArrowUpIcon className={`w-5 h-5 ${c.amount}`} />
                     )}
                   </div>
-                  
-                  {/* Transaction Details */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-text-primary">
-                        {transaction.type === 'received' ? 'From' : 'To'}: {transaction.counterparty}
-                      </span>
-                      <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(transaction.status)} bg-surface-secondary`}>
-                        {getStatusIcon(transaction.status)} {transaction.status}
-                      </span>
+                  <div>
+                    <div className="font-medium text-text-primary mb-1">
+                      {transaction.type === 'received' ? 'From' : 'To'}: {transaction.counterparty}
                     </div>
                     {transaction.narration && (
-                      <div className="text-sm text-text-secondary">{transaction.narration}</div>
+                      <div className="text-sm text-text-secondary mb-1">{transaction.narration}</div>
                     )}
-                    <div className="text-xs text-text-tertiary">{formatDate(transaction.date)}</div>
+                    <div className="flex items-center gap-3">
+                      <div className={`text-xs inline-flex items-center gap-2 px-2 py-0.5 border rounded-full ${c.bg} ${c.text} ${c.border}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`}></span>
+                        <span className="capitalize">{transaction.status}</span>
+                      </div>
+                      <div className="text-xs text-text-tertiary">{formatDate(transaction.date)}</div>
+                    </div>
                   </div>
                 </div>
-                
-                {/* Amount */}
-                <div className="text-right">
-                  <div className={`font-bold text-lg ${
-                    transaction.type === 'received' ? 'text-text-primary' : 'text-text-primary'
-                  }`}>
-                    {transaction.amount} USDC
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+                <div className={`font-bold text-lg ${c.amount}`}>{transaction.amount} USDC</div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
         
         {/* Load More */}
-        <div className="text-center mt-8">
-          <button className="text-text-primary text-sm font-medium">
+        <motion.div 
+          className="text-center mt-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.5 }}
+        >
+          <motion.button 
+            className="text-text-primary text-sm font-medium hover:text-text-secondary transition-colors px-4 py-2 rounded-xl hover:bg-surface"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             Load More Transactions
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
