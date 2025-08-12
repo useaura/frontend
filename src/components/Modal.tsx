@@ -29,7 +29,7 @@ const modalVariants = {
     scale: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 25,
       stiffness: 500,
     },
@@ -50,7 +50,7 @@ const iconVariants = {
     scale: 1,
     rotate: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 15,
       stiffness: 500,
       delay: 0.1,
