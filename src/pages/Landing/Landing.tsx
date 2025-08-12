@@ -24,7 +24,7 @@ const heroVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 20,
       stiffness: 300,
     },
@@ -37,7 +37,7 @@ const featureVariants = {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 20,
       stiffness: 300,
     },
@@ -48,7 +48,7 @@ const buttonVariants = {
   hover: {
     scale: 1.05,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       damping: 15,
       stiffness: 400,
     },
