@@ -26,8 +26,8 @@ const pageVariants = {
 };
 
 const pageTransition = {
-  type: "tween",
-  ease: "anticipate",
+  type: "tween" as const,
+  ease: "easeInOut" as const,
   duration: 0.3,
 };
 
