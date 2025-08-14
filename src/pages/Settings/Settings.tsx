@@ -1,47 +1,114 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { Modal } from '../../components/Modal';
+import { settingsApi, type Profile } from '../../lib/settings';
+import { useToast } from '../../components/toast/ToastProvider';
 
 export const Settings = () => {
   const [settings, setSettings] = useState({
-    name: 'John Doe',
-    dailyLimit: '1000',
-    monthlyLimit: '10000',
-    panicMode: true,
-    reversePinPanic: true,
+    name: '',
+    dailyLimit: '',
+    monthlyLimit: '',
+    panicMode: false,
+    reversePinPanic: false,
   });
   const [isPinFlowOpen, setIsPinFlowOpen] = useState(false);
   const [oldPin, setOldPin] = useState('');
   const [newPin, setNewPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
   const [showPinSuccess, setShowPinSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  // const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const location = useLocation();
+  const toast = useToast();
+  // const location = useLocation();
 
-  // Sync panic mode from URL state if available
+  // Load profile on mount
   useEffect(() => {
-    if (location.state?.panicMode !== undefined) {
-      setSettings(prev => ({ ...prev, panicMode: location.state.panicMode }));
-    }
-  }, [location.state]);
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const profile: Profile = await settingsApi.getProfile();
+        if (!mounted) return;
+        setSettings({
+          name: profile.displayName || '',
+          dailyLimit: profile.cardLimits ? String(profile.cardLimits.dailyLimit) : '',
+          monthlyLimit: profile.cardLimits ? String(profile.cardLimits.monthlyLimit) : '',
+          panicMode: profile.controls.panicMode,
+          reversePinPanic: profile.controls.reversePinEnabled,
+        });
+        setError(null);
+        toast.info('Profile loaded');
+      } catch (e: any) {
+        setError(e?.message || 'Failed to load settings');
+        toast.error(e?.message || 'Failed to load settings');
+      } finally {
+        setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
-  const handleSave = () => {
-    console.log('Saving settings:', settings);
-    navigate('/home', { state: { panicMode: settings.panicMode } });
+  const handleSave = async () => {
+    try {
+      setError(null);
+      // Save display name
+      if (settings.name.trim().length > 0) {
+        await settingsApi.updateDisplayName(settings.name.trim());
+      }
+
+      // Save limits (only send provided values)
+      const daily = settings.dailyLimit.trim() !== '' ? Number(settings.dailyLimit) : undefined;
+      const monthly = settings.monthlyLimit.trim() !== '' ? Number(settings.monthlyLimit) : undefined;
+      if (daily !== undefined || monthly !== undefined) {
+        await settingsApi.updateCardLimits(daily, monthly);
+      }
+
+      toast.success('Settings saved');
+      navigate('/home', { state: { panicMode: settings.panicMode } });
+    } catch (e: any) {
+      setError(e?.message || 'Failed to save settings');
+      toast.error(e?.message || 'Failed to save settings');
+    } finally {
+      // no-op
+    }
   };
 
-  const handlePanicModeToggle = () => {
+  const handlePanicModeToggle = async () => {
     const newPanicMode = !settings.panicMode;
-    setSettings({ ...settings, panicMode: newPanicMode });
-
-    if (newPanicMode) {
-      if (confirm('Are you sure you want to enable Panic Mode? This will disable all transactions.')) {
-        setSettings({ ...settings, panicMode: true });
+    // Optimistic update
+    setSettings(prev => ({ ...prev, panicMode: newPanicMode }));
+    try {
+      if (newPanicMode) {
+        const ok = confirm('Enable Panic Mode? This disables all transactions.');
+        if (!ok) {
+          setSettings(prev => ({ ...prev, panicMode: !newPanicMode }));
+          return;
+        }
       }
-    } else {
-      setSettings({ ...settings, panicMode: false });
+      await settingsApi.togglePanicMode(newPanicMode);
+      toast.success(`Panic Mode ${newPanicMode ? 'enabled' : 'disabled'}`);
+    } catch (e: any) {
+      setSettings(prev => ({ ...prev, panicMode: !newPanicMode }));
+      setError(e?.message || 'Failed to update panic mode');
+      toast.error(e?.message || 'Failed to update panic mode');
+    }
+  };
+
+  const handleReversePinToggle = async () => {
+    const newVal = !settings.reversePinPanic;
+    setSettings(prev => ({ ...prev, reversePinPanic: newVal }));
+    try {
+      await settingsApi.toggleReversePin(newVal);
+      toast.success(`Reverse PIN Panic ${newVal ? 'enabled' : 'disabled'}`);
+    } catch (e: any) {
+      setSettings(prev => ({ ...prev, reversePinPanic: !newVal }));
+      setError(e?.message || 'Failed to update Reverse PIN Panic');
+      toast.error(e?.message || 'Failed to update Reverse PIN Panic');
     }
   };
 
@@ -57,11 +124,17 @@ export const Settings = () => {
     return pinRegex.test(oldPin) && pinRegex.test(newPin) && newPin === confirmPin;
   };
 
-  const handleSavePin = () => {
+  const handleSavePin = async () => {
     if (!canSavePin()) return;
-    console.log('Updating PIN', { oldPin, newPin });
-    resetPinFlow();
-    setShowPinSuccess(true);
+    try {
+      await settingsApi.changePin(oldPin, newPin);
+      resetPinFlow();
+      setShowPinSuccess(true);
+      toast.success('Card PIN updated');
+    } catch (e: any) {
+      setError(e?.message || 'Failed to change PIN');
+      toast.error(e?.message || 'Failed to change PIN');
+    }
   };
 
   return (
@@ -82,6 +155,14 @@ export const Settings = () => {
 
       {/* Content */}
       <div className="flex-1 px-0 py-8 space-y-8">
+        {error && (
+          <div className="mx-6 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+            {error}
+          </div>
+        )}
+        {loading && (
+          <div className="mx-6 text-sm text-text-secondary">Loading settings…</div>
+        )}
         {/* Profile */}
         <div className="bg-surface-primary border border-border/20 p-6 shadow-sm rounded-xl">
           <h2 className="text-sm font-semibold text-text-secondary mb-4">Profile</h2>
@@ -93,6 +174,7 @@ export const Settings = () => {
             value={settings.name}
             onChange={(e) => setSettings({ ...settings, name: e.target.value })}
             className="input-field"
+            placeholder="Your name"
           />
         </div>
 
@@ -109,6 +191,7 @@ export const Settings = () => {
                 value={settings.dailyLimit}
                 onChange={(e) => setSettings({ ...settings, dailyLimit: e.target.value })}
                 className="input-field"
+                placeholder="e.g. 1000"
               />
             </div>
             <div>
@@ -120,6 +203,7 @@ export const Settings = () => {
                 value={settings.monthlyLimit}
                 onChange={(e) => setSettings({ ...settings, monthlyLimit: e.target.value })}
                 className="input-field"
+                placeholder="e.g. 10000"
               />
             </div>
           </div>
@@ -151,7 +235,7 @@ export const Settings = () => {
                 <div className="text-sm text-text-secondary">Enter PIN backwards to activate panic mode</div>
               </div>
               <button
-                onClick={() => setSettings({ ...settings, reversePinPanic: !settings.reversePinPanic })}
+                onClick={handleReversePinToggle}
                 className={`w-14 h-7 transition-all duration-300 ${
                   settings.reversePinPanic ? 'bg-blue-600' : 'bg-surface-secondary'
                 } rounded-xl`}

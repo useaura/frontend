@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useNavigateWithLoading } from '../../hooks/useNavigateWithLoading';
@@ -95,7 +94,6 @@ const mockTransactions: Transaction[] = [
 ];
 
 export const Transactions = () => {
-  const navigate = useNavigate();
   const navigateWithLoading = useNavigateWithLoading();
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionDetails | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
