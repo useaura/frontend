@@ -1,16 +1,31 @@
 // Centralized API client for AuraPay frontend
-// Reads base URL and Authorization token from Vite env.
-// Falls back to localStorage key 'AURAPAY_AUTH' if env not present.
+// - Reads base URL from Vite env (but normalizes to avoid duplicate "/api").
+// - Reads access token from session (cookie "accessToken") set after auth.
+// - Falls back to localStorage key 'AURAPAY_AUTH' if cookie isn't present.
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+import Cookies from "js-cookie";
+
+function normalizeBaseUrl(raw?: string): string {
+  const fallback = "http://localhost:3000";
+  let base = (raw && raw.trim()) || fallback;
+  // Remove trailing slash
+  if (base.endsWith("/")) base = base.replace(/\/+$/, "");
+  // If the env mistakenly includes "/api" at the end, strip it to avoid duplicating
+  if (base.toLowerCase().endsWith("/api")) base = base.slice(0, -4);
+  return base;
+}
+
+const API_BASE_URL = normalizeBaseUrl(
+  import.meta.env.VITE_API_BASE_URL as string | undefined
+);
 
 function getAuthToken(): string | null {
-  // Prefer Vite env variable; ensure it includes the 'Bearer ' prefix when set
-  const fromEnv = import.meta.env.VITE_AUTHORIZATION as string | undefined;
-  if (fromEnv && typeof fromEnv === "string" && fromEnv.trim().length > 0) {
-    return fromEnv.trim();
+  // Primary: read the access token set by auth flow in cookie
+  const fromCookie = Cookies.get("accessToken");
+  if (fromCookie && fromCookie.trim().length > 0) {
+    return fromCookie.trim();
   }
+  // Fallback: a localStorage-based token (used only if cookie not available)
   const fromStorage =
     typeof window !== "undefined"
       ? window.localStorage.getItem("AURAPAY_AUTH")
@@ -33,7 +48,11 @@ export async function apiFetch<T>(
   const token = getAuthToken();
   const headers = new Headers(options.headers || {});
   headers.set("Content-Type", "application/json");
-  if (token) headers.set("Authorization", token);
+  if (token)
+    headers.set(
+      "Authorization",
+      token.startsWith("Bearer ") ? token : `Bearer ${token}`
+    );
 
   const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
 
