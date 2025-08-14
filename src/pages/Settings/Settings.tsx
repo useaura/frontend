@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { Modal } from '../../components/Modal';
 import { settingsApi, type Profile } from '../../lib/settings';
+import { useToast } from '../../components/toast/ToastProvider';
 
 export const Settings = () => {
   const [settings, setSettings] = useState({
@@ -22,6 +23,7 @@ export const Settings = () => {
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
+  const toast = useToast();
   // const location = useLocation();
 
   // Load profile on mount
@@ -40,8 +42,10 @@ export const Settings = () => {
           reversePinPanic: profile.controls.reversePinEnabled,
         });
         setError(null);
+        toast.info('Profile loaded');
       } catch (e: any) {
         setError(e?.message || 'Failed to load settings');
+        toast.error(e?.message || 'Failed to load settings');
       } finally {
         setLoading(false);
       }
@@ -64,9 +68,11 @@ export const Settings = () => {
         await settingsApi.updateCardLimits(daily, monthly);
       }
 
+      toast.success('Settings saved');
       navigate('/home', { state: { panicMode: settings.panicMode } });
     } catch (e: any) {
       setError(e?.message || 'Failed to save settings');
+      toast.error(e?.message || 'Failed to save settings');
     } finally {
       // no-op
     }
@@ -85,9 +91,24 @@ export const Settings = () => {
         }
       }
       await settingsApi.togglePanicMode(newPanicMode);
+      toast.success(`Panic Mode ${newPanicMode ? 'enabled' : 'disabled'}`);
     } catch (e: any) {
       setSettings(prev => ({ ...prev, panicMode: !newPanicMode }));
       setError(e?.message || 'Failed to update panic mode');
+      toast.error(e?.message || 'Failed to update panic mode');
+    }
+  };
+
+  const handleReversePinToggle = async () => {
+    const newVal = !settings.reversePinPanic;
+    setSettings(prev => ({ ...prev, reversePinPanic: newVal }));
+    try {
+      await settingsApi.toggleReversePin(newVal);
+      toast.success(`Reverse PIN Panic ${newVal ? 'enabled' : 'disabled'}`);
+    } catch (e: any) {
+      setSettings(prev => ({ ...prev, reversePinPanic: !newVal }));
+      setError(e?.message || 'Failed to update Reverse PIN Panic');
+      toast.error(e?.message || 'Failed to update Reverse PIN Panic');
     }
   };
 
@@ -109,8 +130,10 @@ export const Settings = () => {
       await settingsApi.changePin(oldPin, newPin);
       resetPinFlow();
       setShowPinSuccess(true);
+      toast.success('Card PIN updated');
     } catch (e: any) {
       setError(e?.message || 'Failed to change PIN');
+      toast.error(e?.message || 'Failed to change PIN');
     }
   };
 
@@ -212,16 +235,7 @@ export const Settings = () => {
                 <div className="text-sm text-text-secondary">Enter PIN backwards to activate panic mode</div>
               </div>
               <button
-                onClick={async () => {
-                  const next = !settings.reversePinPanic;
-                  setSettings(prev => ({ ...prev, reversePinPanic: next }));
-                  try {
-                    await settingsApi.toggleReversePin(next);
-                  } catch (e: any) {
-                    setSettings(prev => ({ ...prev, reversePinPanic: !next }));
-                    setError(e?.message || 'Failed to update reverse PIN setting');
-                  }
-                }}
+                onClick={handleReversePinToggle}
                 className={`w-14 h-7 transition-all duration-300 ${
                   settings.reversePinPanic ? 'bg-blue-600' : 'bg-surface-secondary'
                 } rounded-xl`}
