@@ -5,6 +5,8 @@ import { useNavigateWithLoading } from '../../hooks/useNavigateWithLoading';
 import { Cog6ToothIcon, ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/outline';
 import { Modal } from '../../components/Modal';
 import { TransactionDetailsModal, type TransactionDetails } from '../../components/TransactionDetailsModal';
+import { settingsApi } from '../../lib/settings';
+import { api } from '../../lib/api';
 
 // Animation variants
 const containerVariants = {
@@ -92,6 +94,8 @@ const transactionItemVariants = {
 
 export const Home = () => {
   const [isPanicMode, setIsPanicMode] = useState(false);
+  const [displayName, setDisplayName] = useState<string>("");
+  const [balance, setBalance] = useState<string | number>("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionDetails | null>(null);
@@ -106,6 +110,33 @@ export const Home = () => {
       setIsPanicMode(location.state.panicMode);
     }
   }, [location.state]);
+
+  // Load profile name and wallet balance
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        // Fetch profile for display name
+        const profile = await settingsApi.getProfile();
+        if (isMounted) setDisplayName(profile.displayName || "");
+      } catch (_) {
+        // ignore; keep default
+      }
+
+      try {
+        // Fetch balance from wallet
+        const res = await api.get<{ success: boolean; data: string | number }>(
+          '/api/wallet/balance'
+        );
+        if (isMounted) setBalance(res?.data ?? "");
+      } catch (_) {
+        // ignore; keep default
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleReceive = () => {
     if (!isPanicMode) {
@@ -256,7 +287,7 @@ export const Home = () => {
             variants={itemVariants}
           >
             <div>
-              <h1 className="text-lg font-medium text-text-primary">Hi, User</h1>
+              <h1 className="text-lg font-medium text-text-primary">Hi, {displayName || 'User'}</h1>
             </div>
             <motion.button 
               onClick={handleSettings}
@@ -295,7 +326,7 @@ export const Home = () => {
               <span className="text-sm text-text-secondary">Available Balance</span>
             </div>
             <div className="text-4xl font-bold text-text-primary mb-1">
-              {isPanicMode ? 'Insufficient funds' : '1,234.56 USDC'}
+              {isPanicMode ? 'Insufficient funds' : `${balance || '0'} USDC`}
             </div>
           </motion.div>
 
