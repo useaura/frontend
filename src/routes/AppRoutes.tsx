@@ -4,10 +4,12 @@ import { Landing } from "../pages/Landing/Landing";
 import { Home } from "../pages/Home/Home";
 import { Splash } from "../pages/Splash/Splash";
 import { Auth } from "../pages/Auth/Auth";
+import { GoogleCallback } from "../pages/Auth/GoogleCallback";
 import { Withdraw } from "../pages/Withdraw/Withdraw";
 import { Receive } from "../pages/Receive/Receive";
 import { Settings } from "../pages/Settings/Settings";
 import { Transactions } from "../pages/Transactions/Transactions";
+import { ProtectedRoute } from "../components/ProtectedRoute";
 
 // Page transition variants
 const pageVariants = {
@@ -81,7 +83,7 @@ const AnimatedRoutes = () => {
           }
         />
         <Route
-          path="/home"
+          path="/auth/google/callback"
           element={
             <motion.div
               initial="initial"
@@ -90,64 +92,88 @@ const AnimatedRoutes = () => {
               variants={pageVariants}
               transition={pageTransition}
             >
-              <Home />
+              <GoogleCallback />
             </motion.div>
+          }
+        />
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <motion.div
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <Home />
+              </motion.div>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/withdraw"
           element={
-            <motion.div
-              initial="initial"
-              animate="in"
-              exit="out"
-              variants={pageVariants}
-              transition={pageTransition}
-            >
-              <Withdraw />
-            </motion.div>
+            <ProtectedRoute>
+              <motion.div
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <Withdraw />
+              </motion.div>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/receive"
           element={
-            <motion.div
-              initial="initial"
-              animate="in"
-              exit="out"
-              variants={pageVariants}
-              transition={pageTransition}
-            >
-              <Receive />
-            </motion.div>
+            <ProtectedRoute>
+              <motion.div
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <Receive />
+              </motion.div>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/settings"
           element={
-            <motion.div
-              initial="initial"
-              animate="in"
-              exit="out"
-              variants={pageVariants}
-              transition={pageTransition}
-            >
-              <Settings />
-            </motion.div>
+            <ProtectedRoute>
+              <motion.div
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <Settings />
+              </motion.div>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/transactions"
           element={
-            <motion.div
-              initial="initial"
-              animate="in"
-              exit="out"
-              variants={pageVariants}
-              transition={pageTransition}
-            >
-              <Transactions />
-            </motion.div>
+            <ProtectedRoute>
+              <motion.div
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <Transactions />
+              </motion.div>
+            </ProtectedRoute>
           }
         />
       </Routes>
