@@ -9,6 +9,8 @@ import { Withdraw } from "../pages/Withdraw/Withdraw";
 import { Receive } from "../pages/Receive/Receive";
 import { Settings } from "../pages/Settings/Settings";
 import { Transactions } from "../pages/Transactions/Transactions";
+import { NFC } from "../pages/NFC/NFC";
+import { NFCDemo } from "../pages/NFC/NFCDemo";
 import { ProtectedRoute } from "../components/ProtectedRoute";
 
 // Page transition variants
@@ -172,6 +174,38 @@ const AnimatedRoutes = () => {
                 transition={pageTransition}
               >
                 <Transactions />
+              </motion.div>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/nfc"
+          element={
+            <ProtectedRoute>
+              <motion.div
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <NFC />
+              </motion.div>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/nfc/demo"
+          element={
+            <ProtectedRoute>
+              <motion.div
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <NFCDemo />
               </motion.div>
             </ProtectedRoute>
           }

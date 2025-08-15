@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ArrowLeftIcon, WifiIcon } from '@heroicons/react/24/outline';
+import { NFCScanner } from '../../components/NFCScanner';
 
 type WithdrawStep = 'details' | 'preview' | 'pin';
 
@@ -12,7 +13,19 @@ export const Withdraw = () => {
     fee: '0.50',
   });
   const [pin, setPin] = useState('');
+  const [showNFCScanner, setShowNFCScanner] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if we have receiver address from navigation state (e.g., from NFC scan)
+  useEffect(() => {
+    if (location.state?.receiverAddress) {
+      setWithdrawData(prev => ({
+        ...prev,
+        receiverAddress: location.state.receiverAddress
+      }));
+    }
+  }, [location.state]);
 
   const handleContinue = () => {
     if (currentStep === 'details') {
@@ -45,13 +58,22 @@ export const Withdraw = () => {
         <label className="block text-sm font-medium text-text-secondary mb-2">
           Receiver Wallet Address
         </label>
-        <input
-          type="text"
-          value={withdrawData.receiverAddress}
-          onChange={(e) => setWithdrawData({ ...withdrawData, receiverAddress: e.target.value })}
-          placeholder="Enter wallet address"
-          className="w-full bg-surface border border-border/20 rounded-xl px-4 py-3 text-text-primary placeholder-text-tertiary focus:outline-none focus:border-border/60"
-        />
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={withdrawData.receiverAddress}
+            onChange={(e) => setWithdrawData({ ...withdrawData, receiverAddress: e.target.value })}
+            placeholder="Enter wallet address"
+            className="flex-1 bg-surface border border-border/20 rounded-xl px-4 py-3 text-text-primary placeholder-text-tertiary focus:outline-none focus:border-border/60"
+          />
+          <button
+            onClick={() => setShowNFCScanner(true)}
+            className="px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-colors flex items-center gap-2"
+          >
+            <WifiIcon className="w-5 h-5" />
+            <span className="hidden sm:inline">Scan</span>
+          </button>
+        </div>
       </div>
       <div className="mb-6">
         <label className="block text-sm font-medium text-text-secondary mb-2">
@@ -176,6 +198,40 @@ export const Withdraw = () => {
           Continue
         </button>
       </div>
+
+      {/* NFC Scanner Modal */}
+      {showNFCScanner && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-surface border border-border/20 rounded-xl p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-text-primary">Scan NFC Tag</h3>
+              <button
+                onClick={() => setShowNFCScanner(false)}
+                className="text-text-secondary hover:text-text-primary"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <NFCScanner
+              onScan={(data) => {
+                console.log('NFC Data scanned:', data);
+                if (data.startsWith('0x') && data.length === 42) {
+                  // It's a wallet address
+                  setWithdrawData(prev => ({ ...prev, receiverAddress: data }));
+                  setShowNFCScanner(false);
+                } else {
+                  alert(`Scanned data: ${data}\n\nThis doesn't appear to be a valid wallet address.`);
+                }
+              }}
+              onError={(error) => {
+                console.error('NFC Error:', error);
+                alert(`NFC Error: ${error}`);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
