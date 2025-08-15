@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon, QrCodeIcon, CreditCardIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, QrCodeIcon, CreditCardIcon, WifiIcon } from '@heroicons/react/24/outline';
+import { NFCScanner } from '../../components/NFCScanner';
 
-type ReceiveStep = 'options' | 'address' | 'card-amount' | 'card-waiting' | 'card-pin';
+type ReceiveStep = 'options' | 'address' | 'card-amount' | 'card-waiting' | 'card-pin' | 'nfc-scan';
 
 export const Receive = () => {
   const [currentStep, setCurrentStep] = useState<ReceiveStep>('options');
@@ -46,6 +47,24 @@ export const Receive = () => {
           <div className="text-left">
             <div className="font-semibold text-lg text-text-primary">Receive with Card</div>
             <div className="text-sm text-text-secondary">NFC card transfer</div>
+          </div>
+        </div>
+      </button>
+
+      <button
+        onClick={() => setCurrentStep('nfc-scan')}
+        className="w-full bg-surface border border-border/20 rounded-xl p-6 hover:bg-surface-secondary transition-colors"
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-surface-secondary border border-border/20 rounded-xl flex items-center justify-center">
+            <WifiIcon className="w-6 h-6 text-text-primary" />
+          </div>
+          <div className="text-left">
+            <div className="flex items-center gap-2">
+              <div className="font-semibold text-lg text-text-primary">Scan NFC Tag</div>
+              <span className="px-2 py-1 text-xs bg-blue-500/20 text-blue-500 rounded-full">New</span>
+            </div>
+            <div className="text-sm text-text-secondary">Read data from NFC tags</div>
           </div>
         </div>
       </button>
@@ -149,6 +168,34 @@ export const Receive = () => {
     </div>
   );
 
+  const renderNFCScanStep = () => (
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-xl font-semibold mb-2 text-text-primary">Scan NFC Tag</h2>
+        <p className="text-text-secondary">Hold your device near an NFC tag to read its data</p>
+      </div>
+      
+      <NFCScanner
+        onScan={(data) => {
+          console.log('NFC Data scanned:', data);
+          // Handle the scanned data - could be wallet address, text, etc.
+          if (data.startsWith('0x') && data.length === 42) {
+            // It's a wallet address
+            setReceiveData(prev => ({ ...prev, receiver: data }));
+            setCurrentStep('card-amount');
+          } else {
+            // It's other data, show it
+            alert(`Scanned data: ${data}`);
+          }
+        }}
+        onError={(error) => {
+          console.error('NFC Error:', error);
+          alert(`NFC Error: ${error}`);
+        }}
+      />
+    </div>
+  );
+
   const getStepTitle = () => {
     switch (currentStep) {
       case 'options': return 'Receive USDC';
@@ -156,6 +203,7 @@ export const Receive = () => {
       case 'card-amount': return 'Receive with Card';
       case 'card-waiting': return 'Receive with Card';
       case 'card-pin': return 'Enter PIN';
+      case 'nfc-scan': return 'Scan NFC Tag';
       default: return '';
     }
   };
@@ -177,6 +225,7 @@ export const Receive = () => {
     else if (currentStep === 'card-amount') setCurrentStep('options');
     else if (currentStep === 'card-waiting') setCurrentStep('card-amount');
     else if (currentStep === 'card-pin') setCurrentStep('card-waiting');
+    else if (currentStep === 'nfc-scan') setCurrentStep('options');
   };
 
   const handleContinue = () => {
@@ -211,6 +260,7 @@ export const Receive = () => {
         {currentStep === 'card-amount' && renderCardAmountStep()}
         {currentStep === 'card-waiting' && renderCardWaitingStep()}
         {currentStep === 'card-pin' && renderCardPinStep()}
+        {currentStep === 'nfc-scan' && renderNFCScanStep()}
       </div>
 
       {/* Continue Button */}

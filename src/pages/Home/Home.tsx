@@ -378,6 +378,33 @@ export const Home = () => {
                 <span className="font-semibold text-lg">Withdraw</span>
               </div>
             </motion.button>
+
+            <motion.button
+              onClick={() => navigateWithLoading('/nfc', {
+                loadingMessage: "Opening NFC scanner...",
+                delay: 300
+              })}
+              disabled={isPanicMode}
+              className={`p-6 rounded-xl transition-all duration-300 ${
+                isPanicMode
+                  ? 'bg-surface-secondary text-text-tertiary cursor-not-allowed'
+                  : 'bg-surface border border-border text-text-primary shadow-sm hover:shadow-md'
+              }`}
+              variants={buttonVariants}
+              whileHover={!isPanicMode ? "hover" : undefined}
+              whileTap={!isPanicMode ? "tap" : undefined}
+            >
+              <div className="flex flex-col items-center">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 ${
+                  isPanicMode ? 'bg-surface-tertiary' : 'bg-surface-secondary'
+                }`}>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+                  </svg>
+                </div>
+                <span className="font-semibold text-lg">NFC</span>
+              </div>
+            </motion.button>
           </motion.div>
 
           {/* Recent Transactions */}
